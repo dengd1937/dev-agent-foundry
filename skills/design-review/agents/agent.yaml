@@ -1,0 +1,7 @@
+interface:
+  display_name: "Design Review"
+  short_description: "独立方案审查：完整性、可行性、安全性、可维护性四维度，用户选择修复项后迭代优化"
+  default_prompt: "审查当前 git diff 中的设计方案，从完整性、可行性、安全性、可维护性四个维度输出结构化 findings，并让我选择需要修复的问题。"
+
+# Agent-agnostic skill - works with any LLM provider.
+# No provider-specific configuration required.
