@@ -1,68 +1,163 @@
 # Git Workflow
 
-本文件定义跨项目通用的 Git / PR 交付基线。
-
-具体执行步骤可以交给 `git-workflow` skill，但规则、门禁和完成态应以这里为准。
+> 本文档定义跨项目通用的 Git / PR 交付规则。
+> 具体执行步骤优先由 `git-workflow` skill 落地；本文只保留规则、门禁与完成态定义。
 
 ## 核心原则
 
-- 默认采用分支 + Pull Request 工作流，而不是直接在主分支上完成交付
-- 用户要求“提交代码”“推到远端”时，默认目标是完成一条可交付链路，而不是只执行单个 Git 命令
-- `push` 和 “PR 已创建”都只是中间状态，通常不应误判为交付完成
+- 默认采用 **Pull Request 模式**，代码变更应通过工作分支和 PR 进入主分支
+- **禁止直接 push 到主分支**，例如 `main` 或 `master`
+- 用户请求“提交代码”“提交到远端”“创建 PR”等交付动作时，默认目标是推进完整交付链路，而不是只执行单个 Git 命令
+- `push` 不是完成态；`PR 已创建` 通常也不是完成态
+- 只有在实现、验证、必要审查都完成后，才进入 Git / PR 交付阶段
+
+开发前的完整流程见 [development-workflow.md](./development-workflow.md)。
 
 ## 分支与提交
 
-- 不要直接在受保护主分支上开发或推送
-- 提交前应先确认当前位于符合团队约定的工作分支
-- commit message 应使用项目约定格式；若项目未定义，推荐使用 `<type>: <description>`
-- 提交中不应混入与当前任务无关的本地改动
+推荐使用工作分支交付，例如：
+
+```bash
+git checkout -b <type>/<short-description>
+```
+
+常见分支前缀：
+
+| 前缀 | 用途 | 示例 |
+|---|---|---|
+| `feature/` | 新功能 | `feature/add-metrics-endpoint` |
+| `fix/` | Bug 修复 | `fix/dedup-race-condition` |
+| `refactor/` | 重构 | `refactor/simplify-config` |
+| `docs/` | 文档 | `docs/update-readme` |
+| `chore/` | 杂项 | `chore/update-ci-config` |
+
+提交规则：
+
+- 远端交付前应位于符合团队约定的工作分支
+- 若当前在主分支，不应直接推送；应先创建工作分支
+- commit message 应采用项目约定格式；若项目未定义，推荐使用 `<type>: <description>`
+- 不应把与当前任务无关的本地改动混入同一次提交
 
 ## 提交前门禁
 
-- 明确本次改动要解决的问题、成功标准和主要回归风险
-- 至少完成与改动范围匹配的本地验证
-- 同步更新受影响的注释、文档、配置说明和测试
-- 若改动风险较高、跨度较大或涉及关键链路，应补充作者自审或独立 review
+在执行 `commit` 前，至少确认：
+
+- 已完成 [development-workflow.md](./development-workflow.md) 中要求的研究、规划、验证和审查
+- 已明确本次改动要解决的问题、成功标准和主要回归风险
+- 已完成与改动范围匹配的本地验证
+- 已同步更新受影响的注释、文档、配置说明和测试
+- 若改动风险较高、跨度较大或涉及关键链路，已完成必要的独立 review
+
+纯说明性文档改动可走轻量路径；会影响流程、配置、部署、排障、验收标准或 agent 行为的行为性文档改动，应补充最小验证摘要。
+
+## 独立 Reviewer 协作
+
+以下情况默认建议发起独立 reviewer：
+
+- 生产代码、测试、脚本、配置、依赖、CI、部署改动
+- Bug 修复、跨模块重构、外部系统集成改动
+- 会影响行为、流程、配置、排障或验收标准的文档改动
+
+协作规则：
+
+1. Author 先完成本地改动与最小必要验证
+2. Author 创建或更新 PR
+3. Author 新开一个 Agent 会话执行 `code-review-expert`
+4. reviewer 基于 PR diff、关键文件和本地验证摘要输出 findings
+5. reviewer 结果应直接回写到 PR review 或 PR comment
+6. Author 读取 findings，修复后继续 push / 更新 PR
+
+执行约束：
+
+- 当前 Author 会话不得在同一上下文中充当独立 reviewer
+- 这里要求的是“新开 Agent 会话”的流程独立性，不要求 reviewer 使用不同 GitHub 账号
+- reviewer 结果默认作为协作信息，不由 CI 自动阻塞或放行
 
 ## Pull Request 规则
 
-- 若仓库采用 PR 工作流，就不应把“直推主分支”当作合法捷径
-- 创建 PR 时，应提供最小充分的上下文，包括改动目标、关键变更点和本地验证方式
-- 若项目有 PR 模版，应直接使用，而不是另起一套格式
-- reviewer 需要优先关注的风险、未覆盖项和例外处理应在 PR 中显式说明
+- 对采用 PR 工作流的仓库，`push` 后应继续判断是否需要创建或更新 PR
+- 若用户未明确要求停在某个中间步骤，应继续推进到 `PR -> CI -> 处理反馈` 的下一稳定状态
+- 若仓库已有 PR 模版，应直接使用，而不是另起一套格式
 
-## CI 与反馈处理
+PR 描述至少应包含：
 
-- 只要 CI 仍处于排队或运行中，就不应把交付流程视为完成
-- 若 CI 或 review 提出问题，应执行“修复 -> 重跑相关验证 -> 更新分支/PR”的循环
-- 未重新验证前，不应只靠口头说明宣布问题已解决
-- 长时间等待 CI 时，应向用户同步进度，但应明确这只是中间状态
+- 改动目标
+- 关键变更点
+- 本地验证方式
+- reviewer 需要优先关注的上下文（可选）
+- 仍存在的风险或未覆盖项（可选）
 
-## 完成态
+## CI 与反馈处理规则
 
-交付类请求通常只有满足以下任一条件，才算当前阶段完成：
+- 创建或更新 PR 后，应继续进入 CI 阶段，而不是把 `push` 或 `PR 已创建` 误判为完成
+- CI 的具体检查项、失败分类和处理口径，统一以 [ci-workflow.md](./ci-workflow.md) 为准
+- 若仓库维护 required checks、branch protection 或合并策略，应遵循仓库现有设置，而不是临时发明新门禁
+
+若 CI 或 reviewer 提出问题，应循环执行：
+
+1. 修复问题
+2. 重跑相关本地验证
+3. 必要时再次发起独立 reviewer
+4. 重新 push 分支或更新 PR
+
+## 人类介入时机
+
+以下情况建议升级为人工判断：
+
+- 权限、认证、敏感数据、外部系统关键链路改动
+- reviewer 指出了高风险问题，但证据不足以自动判断
+- 修复轮次过多，问题长期不收敛
+- 需求本身仍有歧义，无法仅靠代码与文档判断
+
+## 禁止事项
+
+- 禁止直接 push 到主分支
+- 禁止把“提交到远端”理解成允许直推受保护分支
+- 禁止跳过 CI 或关键反馈直接宣布交付完成
+- 禁止把“分支已推送”或“PR 已创建”误判为交付完成，除非用户明确要求停在该步骤
+- 禁止在当前 Author 会话中直接充当独立 reviewer
+
+## 完成态定义
+
+交付类请求通常只有满足以下任一条件，才可视为当前阶段完成：
 
 1. 用户明确要求停在某个中间步骤
-2. PR 已达到可推进的稳定状态，并已向用户同步
+2. PR 已达到可推进的稳定状态，且已向用户同步结果
 3. PR 已合并
-4. CI 或 reviewer 长时间未到终态，且已明确说明仍在等待中
+4. CI 或 reviewer 长时间未到终态，且已明确向用户同步“仍在等待中”
 
 以下状态通常都不算完成：
 
 - 分支已推送
 - PR 已创建
-- CI 已触发但仍未到终态
+- CI 已触发但仍在排队或运行中
 
-## Required Checks
+## Agent 执行入口
 
-在声明交付类任务完成前，至少确认：
+- 涉及 `commit`、`push`、创建 PR、等待 CI、推进合并等交付动作时，优先使用 `git-workflow`
+- 独立 reviewer 协议由 `code-review-expert` 负责
 
-- 当前改动位于正确工作分支，且未混入无关本地变更
-- 已完成与改动范围匹配的本地验证
-- PR 已提供目标、关键变更点、验证方式和残余风险
-- CI 和 review 已到达可推进终态，或已向用户明确说明仍在等待中
+## Commit Message 格式
 
-## Related Skills
+```text
+<type>: <description>
 
-- 具体提交流程、PR 推进和交付动作，参考 `git-workflow`
-- 提交前作者自审，参考 `self-review`
+# 示例
+feat: add webhook receiver endpoint
+fix: resolve dedup race condition
+refactor: simplify config loading
+docs: update README deployment section
+chore: update ci configuration
+```
+
+常见 type：
+
+| type | 说明 |
+|---|---|
+| `feat` | 新功能 |
+| `fix` | Bug 修复 |
+| `refactor` | 重构（不改变功能） |
+| `docs` | 文档变更 |
+| `chore` | 杂项（CI、配置等） |
+| `test` | 测试相关 |
+| `style` | 代码格式（不影响逻辑） |

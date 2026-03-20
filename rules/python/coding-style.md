@@ -6,54 +6,53 @@ paths:
 
 # Python Coding Style
 
-> This file extends [../common/coding-style.md](../common/coding-style.md) with Python-specific content.
+> 本文件在 [common/coding-style.md](../common/coding-style.md) 的基础上补充 Python 特有内容。
 
-本文件定义 Python 项目的编码、类型和模型约束。
+## 标准
 
-## 工具链
+- 遵循 **PEP 8** 规范
+- 在所有函数签名上使用 **类型注解**
 
-- 优先使用 `uv` 作为依赖与执行入口
-- 优先使用 `ruff` 作为格式化与 lint 工具
-- 若项目已固定行宽，优先遵循项目配置；若未明确，推荐 120 字符以内
+## 不可变性
 
-常见命令：
+优先使用不可变数据结构：
 
-```bash
-uv run ruff format .
-uv run ruff check .
-uv run pytest
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class User:
+    name: str
+    email: str
+
+from typing import NamedTuple
+
+class Point(NamedTuple):
+    x: float
+    y: float
 ```
 
-## 命名
+## 格式化
 
-- 变量、函数、模块使用 `snake_case`
-- 类使用 `PascalCase`
-- 常量使用 `UPPER_CASE`
-- 私有函数、私有模块使用前导下划线
+- 使用 **black** 做代码格式化
+- 使用 **isort** 做 import 排序
+- 使用 **ruff** 做 lint 检查
 
-## 类型注解
+## 提交前门禁
 
-- 所有公共函数、公共方法和跨模块边界函数应补齐类型注解
-- 优先使用现代 typing 语法，如 `list[str]`、`dict[str, int]`
-- 除非处于外部动态边界，否则避免使用 `Any`
-- 对外部 SDK、动态 JSON 或弱类型输入，尽量在边界层完成类型收敛，再向内传播
+- 修改 Python 文件后，提交前必须完成格式化、lint 和类型检查
+- 本地可提前执行这些检查，以减少在 PR 阶段返工
+- CI 应重复执行同一组核心检查，并作为最终门禁
 
-## 数据模型与校验
+最小检查集合：
 
-- 优先在边界层使用结构化模型而不是散乱字典
-- 若项目使用 Pydantic，优先使用当前项目约定的主版本，并保持同一仓库内风格一致
-- 新增输入模型时，应明确 extra 字段策略，而不是默认忽略协议变化
-- 领域规则应尽量通过模型校验器、显式验证函数或统一入口收敛
+```bash
+black .
+isort .
+ruff check .
+mypy .
+```
 
-## Python 代码组织
+## 参考
 
-- 配置访问应通过统一 settings 层，不要在业务模块中散落 `os.environ`
-- 外部输入校验、模型转换和协议兼容逻辑应尽量放在边界层
-- 错误处理应保留原始异常上下文，避免随意吞错或改成无法定位的问题描述
-
-## Required Checks
-
-- 变更是否延续了项目既有的 `uv`、`ruff`、`pytest` 工具链
-- 公共函数和跨模块边界是否补齐了必要类型注解
-- 输入模型、Pydantic 模型或 schema 是否明确了额外字段与兼容策略
-- 是否避免在业务模块中直接读取 `os.environ` 或散落配置解析逻辑
+参见 skill：`python-patterns`，获取更全面的 Python 习惯用法和模式。

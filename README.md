@@ -31,19 +31,19 @@ dev-agent-foundry/
 │       ├── git-workflow/
 │       ├── code-review-expert/
 │       ├── design-review/
-│       ├── self-review/
-│       └── doc-gardening/
+│       ├── doc-gardening/
+│       └── self-review/
 ├── rules/
 │   ├── README.md
 │   ├── common/
+│       ├── development-workflow.md
 │       ├── coding-style.md
-│       ├── documentation.md
-│       ├── configuration.md
-│       ├── git-workflow.md
-│       ├── testing.md
-│       ├── code-review.md
+│       ├── patterns.md
+│       ├── performance.md
 │       ├── security.md
-│       └── agents.md
+│       ├── testing.md
+│       ├── git-workflow.md
+│       └── ci-workflow.md
 │   └── python/
 │       ├── coding-style.md
 │       ├── testing.md
@@ -66,9 +66,12 @@ dev-agent-foundry/
 |---|---|---|
 | [.agents/skills/git-workflow](.agents/skills/git-workflow/SKILL.md) | 交付工作流 | commit / push / PR / CI / merge 全流程闭环 |
 | [.agents/skills/code-review-expert](.agents/skills/code-review-expert/SKILL.md) | 独立代码审查 | findings 驱动的结构化 review 协议 |
-| [.agents/skills/self-review](.agents/skills/self-review/SKILL.md) | 本地自审 | 提交前的作者视角质量验证 |
+| [.agents/skills/self-review](.agents/skills/self-review/SKILL.md) | 本地自审 | 独立可选 skill，当前不在默认工作流中 |
 | [.agents/skills/design-review](.agents/skills/design-review/SKILL.md) | 设计方案审查 | 完整性、可行性、安全性、可维护性四维度 |
 | [.agents/skills/doc-gardening](.agents/skills/doc-gardening/SKILL.md) | 文档园艺 | 检测并修复文档与代码之间的漂移 |
+| [.agents/skills/python-patterns](.agents/skills/python-patterns/SKILL.md) | Python 开发模式 | Pythonic idioms、类型注解、异常处理、包组织 |
+| [.agents/skills/django-security](.agents/skills/django-security/SKILL.md) | Django 安全实践 | Django 认证鉴权、CSRF/XSS/SQL 注入、生产安全配置 |
+| [.agents/skills/python-testing](.agents/skills/python-testing/SKILL.md) | Python 测试策略 | pytest、TDD、fixtures、mock、覆盖率与测试分层 |
 
 ## 使用方式
 
@@ -99,16 +102,16 @@ git submodule add https://github.com/dengd1937/dev-agent-foundry.git .agents/dev
 
 `rules/` 参考 `everything-claude-code` 的做法，用来沉淀默认应遵守的规则，而不是具体任务协议。
 
-当前已落地的第一批通用规则包括：
+当前 `common` 层先保留八份主文档：
 
+- [rules/common/development-workflow.md](rules/common/development-workflow.md)
 - [rules/common/coding-style.md](rules/common/coding-style.md)
-- [rules/common/documentation.md](rules/common/documentation.md)
-- [rules/common/configuration.md](rules/common/configuration.md)
-- [rules/common/git-workflow.md](rules/common/git-workflow.md)
-- [rules/common/testing.md](rules/common/testing.md)
-- [rules/common/code-review.md](rules/common/code-review.md)
+- [rules/common/patterns.md](rules/common/patterns.md)
+- [rules/common/performance.md](rules/common/performance.md)
 - [rules/common/security.md](rules/common/security.md)
-- [rules/common/agents.md](rules/common/agents.md)
+- [rules/common/testing.md](rules/common/testing.md)
+- [rules/common/git-workflow.md](rules/common/git-workflow.md)
+- [rules/common/ci-workflow.md](rules/common/ci-workflow.md)
 
 同时已经补出第一批语言层规则：
 
