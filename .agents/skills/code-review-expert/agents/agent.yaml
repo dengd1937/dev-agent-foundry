@@ -1,7 +1,0 @@
-interface:
-  display_name: "Code Review Expert"
-  short_description: "Independent code review: SOLID, security, performance, correctness, architecture compliance"
-  default_prompt: "Review current git changes for SOLID violations, security risks, race conditions, error handling issues, performance problems, and language-specific best practices."
-
-# Agent-agnostic skill - works with any LLM provider.
-# No provider-specific configuration required.

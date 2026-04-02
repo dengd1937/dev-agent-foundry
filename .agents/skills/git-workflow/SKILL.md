@@ -1,232 +1,715 @@
 ---
 name: git-workflow
-description: |
-  交付类工作流 skill。用于在用户要求提交代码、推送远端、创建 PR、继续跟 CI、推进合并时，按仓库 Git/PR 规范执行完整流程，而不是停在中间步骤。
-
-  当用户提到"commit""push""提交到远端""创建 PR""继续处理 CI""推进合并"等交付动作时触发。
+description: Git workflow patterns including branching strategies, commit conventions, merge vs rebase, conflict resolution, and collaborative development best practices for teams of all sizes.
+origin: ECC
 ---
 
-# Git Workflow
+# Git Workflow Patterns
 
-> 本 skill 将仓库的 Git/PR 规范转成执行工作流。目标不是复述规则，而是确保交付类请求按既定门禁推进到下一稳定状态。
+Best practices for Git version control, branching strategies, and collaborative development.
 
-## 何时使用
+## When to Activate
 
-以下任一场景应使用本 skill：
+- Setting up Git workflow for a new project
+- Deciding on branching strategy (GitFlow, trunk-based, GitHub flow)
+- Writing commit messages and PR descriptions
+- Resolving merge conflicts
+- Managing releases and version tags
+- Onboarding new team members to Git practices
 
-- 用户要求 `commit`、`push`、`提交到远端`
-- 用户要求创建或继续推进 PR
-- 用户要求等待 CI、处理 CI 失败、推进到可合并
-- 用户要求继续某个已有 commit / 分支 / PR 的交付流程
+## Branching Strategies
 
-以下场景通常不需要单独触发：
+### GitHub Flow (Simple, Recommended for Most)
 
-- 纯代码解释、架构讨论
-- 只修改本地文件、明确不涉及交付
+Best for continuous deployment and small-to-medium teams.
 
-## 核心原则
-
-- 默认采用 PR 工作流，**禁止直接 push 到主分支**（`main` / `master`）
-- 交付类请求的默认完成态不是 `push`，也不是"PR 已创建"，而是：
-  - 已进入正确分支/PR 流程
-  - CI 和必要 review 已处理到当前可推进的稳定状态
-- 除非用户明确要求停在某一步，否则不能在中间步骤提前结束
-- 当前 CI 只负责基础质量门禁，不再负责校验 reviewer 结果或 PR 模版中的自审内容
-- 本地 reviewer 是默认协作流程，但 reviewer 结果不作为 CI 强制门禁
-
-### 补充规则来源
-
-如果项目中存在以下文档，应优先参照：
-
-- Git 流程文档（如 `docs/devops/git_workflow.md` 或类似路径）
-- 本地 reviewer 规范（如 `docs/devops/local_independent_reviewer.md`）
-- reviewer 请求模板（如 `docs/devops/review_request_template.md`）
-
-相关 skill：
-
-- 可选本地自审：`self-review`
-- 独立 reviewer 协议：`code-review-expert`
-
-## 执行流程
-
-### Step 1：确认当前交付阶段
-
-先识别用户要推进到哪一步：
-
-- 本地提交前：需要开发、本地验证、必要时 reviewer
-- 远端交付：需要分支、push、PR
-- PR 跟进：需要等待 CI、读取反馈、修复后再推
-- 合并收口：需要确认门禁通过并完成 merge
-
-如果用户只给了模糊请求，例如"提交到远端"，默认按完整交付流程推进，而不是只执行一次 `git push`。
-
-### Step 2：检查仓库状态与约束
-
-至少检查：
-
-```bash
-git status --short --branch
-git branch --show-current
-git remote -v
+```
+main (protected, always deployable)
+  │
+  ├── feature/user-auth      → PR → merge to main
+  ├── feature/payment-flow   → PR → merge to main
+  └── fix/login-bug          → PR → merge to main
 ```
 
-必要时继续检查：
+**Rules:**
+- `main` is always deployable
+- Create feature branches from `main`
+- Open Pull Request when ready for review
+- After approval and CI passes, merge to `main`
+- Deploy immediately after merge
 
-- 当前是否在主分支（`main` / `master`）
-- 工作区是否有未提交变更
-- 是否已有对应 PR
-- 当前请求是否会触发 PR 工作流
+### Trunk-Based Development (High-Velocity Teams)
 
-若当前在主分支且需要远端交付：
+Best for teams with strong CI/CD and feature flags.
 
-- 不要直推
-- 创建符合规范的工作分支后继续
+```
+main (trunk)
+  │
+  ├── short-lived feature (1-2 days max)
+  ├── short-lived feature
+  └── short-lived feature
+```
 
-### Step 3：完成与任务对应的本地验证
+**Rules:**
+- Everyone commits to `main` or very short-lived branches
+- Feature flags hide incomplete work
+- CI must pass before merge
+- Deploy multiple times per day
 
-按以下规则判断：
+### GitFlow (Complex, Release-Cycle Driven)
 
-- 代码改动、配置、脚本、CI、依赖、部署、行为性文档改动：至少运行与任务对应的本地验证
-- 纯说明性文档改动：可走轻量路径
-- 只有用户明确要求额外本地自审时，才额外运行 `self-review`
+Best for scheduled releases and enterprise projects.
 
-如果关键本地验证尚未完成：
+```
+main (production releases)
+  │
+  └── develop (integration branch)
+        │
+        ├── feature/user-auth
+        ├── feature/payment
+        │
+        ├── release/1.0.0    → merge to main and develop
+        │
+        └── hotfix/critical  → merge to main and develop
+```
 
-- 先补验证
-- 不要直接进入 commit / push
+**Rules:**
+- `main` contains production-ready code only
+- `develop` is the integration branch
+- Feature branches from `develop`, merge back to `develop`
+- Release branches from `develop`, merge to `main` and `develop`
+- Hotfix branches from `main`, merge to both `main` and `develop`
 
-### Step 4：判断是否需要独立 reviewer
+### When to Use Which
 
-按以下规则判断：
+| Strategy | Team Size | Release Cadence | Best For |
+|----------|-----------|-----------------|----------|
+| GitHub Flow | Any | Continuous | SaaS, web apps, startups |
+| Trunk-Based | 5+ experienced | Multiple/day | High-velocity teams, feature flags |
+| GitFlow | 10+ | Scheduled | Enterprise, regulated industries |
 
-- 代码改动：默认需要独立 reviewer
-- 高风险配置、流程、架构、行为性文档改动：默认需要独立 reviewer
-- 纯说明性文档改动：通常可跳过
+## Commit Messages
 
-当前默认独立 reviewer 是本地新会话的 `code-review-expert`。
+### Conventional Commits Format
 
-reviewer 结果应直接通过 GitHub PR review 或 PR comment 回写到当前 PR，而不是在 Author / Reviewer 两个会话中复制粘贴。
-这里要求的独立性是"新开 Agent 会话"的流程隔离，不要求 reviewer 使用不同 GitHub 账号。
+```
+<type>(<scope>): <subject>
 
-当进入独立 reviewer 路径时，当前 Author 会话必须明确提醒：
+[optional body]
+
+[optional footer(s)]
+```
+
+### Types
+
+| Type | Use For | Example |
+|------|---------|---------|
+| `feat` | New feature | `feat(auth): add OAuth2 login` |
+| `fix` | Bug fix | `fix(api): handle null response in user endpoint` |
+| `docs` | Documentation | `docs(readme): update installation instructions` |
+| `style` | Formatting, no code change | `style: fix indentation in login component` |
+| `refactor` | Code refactoring | `refactor(db): extract connection pool to module` |
+| `test` | Adding/updating tests | `test(auth): add unit tests for token validation` |
+| `chore` | Maintenance tasks | `chore(deps): update dependencies` |
+| `perf` | Performance improvement | `perf(query): add index to users table` |
+| `ci` | CI/CD changes | `ci: add PostgreSQL service to test workflow` |
+| `revert` | Revert previous commit | `revert: revert "feat(auth): add OAuth2 login"` |
+
+### Good vs Bad Examples
+
+```
+# BAD: Vague, no context
+git commit -m "fixed stuff"
+git commit -m "updates"
+git commit -m "WIP"
+
+# GOOD: Clear, specific, explains why
+git commit -m "fix(api): retry requests on 503 Service Unavailable
+
+The external API occasionally returns 503 errors during peak hours.
+Added exponential backoff retry logic with max 3 attempts.
+
+Closes #123"
+```
+
+### Commit Message Template
+
+Create `.gitmessage` in repo root:
+
+```
+# <type>(<scope>): <subject>
+# # Types: feat, fix, docs, style, refactor, test, chore, perf, ci, revert
+# Scope: api, ui, db, auth, etc.
+# Subject: imperative mood, no period, max 50 chars
+#
+# [optional body] - explain why, not what
+# [optional footer] - Breaking changes, closes #issue
+```
+
+Enable with: `git config commit.template .gitmessage`
+
+## Merge vs Rebase
+
+### Merge (Preserves History)
+
+```bash
+# Creates a merge commit
+git checkout main
+git merge feature/user-auth
+
+# Result:
+# *   merge commit
+# |\
+# | * feature commits
+# |/
+# * main commits
+```
+
+**Use when:**
+- Merging feature branches into `main`
+- You want to preserve exact history
+- Multiple people worked on the branch
+- The branch has been pushed and others may have based work on it
+
+### Rebase (Linear History)
+
+```bash
+# Rewrites feature commits onto target branch
+git checkout feature/user-auth
+git rebase main
+
+# Result:
+# * feature commits (rewritten)
+# * main commits
+```
+
+**Use when:**
+- Updating your local feature branch with latest `main`
+- You want a linear, clean history
+- The branch is local-only (not pushed)
+- You're the only one working on the branch
+
+### Rebase Workflow
+
+```bash
+# Update feature branch with latest main (before PR)
+git checkout feature/user-auth
+git fetch origin
+git rebase origin/main
+
+# Fix any conflicts
+# Tests should still pass
+
+# Force push (only if you're the only contributor)
+git push --force-with-lease origin feature/user-auth
+```
+
+### When NOT to Rebase
+
+```
+# NEVER rebase branches that:
+- Have been pushed to a shared repository
+- Other people have based work on
+- Are protected branches (main, develop)
+- Are already merged
+
+# Why: Rebase rewrites history, breaking others' work
+```
+
+## Pull Request Workflow
+
+### PR Title Format
+
+```
+<type>(<scope>): <description>
+
+Examples:
+feat(auth): add SSO support for enterprise users
+fix(api): resolve race condition in order processing
+docs(api): add OpenAPI specification for v2 endpoints
+```
+
+### PR Description Template
 
 ```markdown
-下一步需要执行独立 reviewer 审查。
+## What
 
-请新开一个 Agent 会话窗口，并使用 `code-review-expert` 对当前变更做独立审查。
-不要在当前 Author 会话里继续 review 自己的改动。
-reviewer 完成后，请直接把结构化结论提交为当前 PR 的 review，而不是回复到聊天窗口。
-若 GitHub 因 reviewer 与 PR 作者同账号而拒绝 `--approve` / `--request-changes`，可退化为 `COMMENT` review，但 body 中仍需明确 `Overall assessment`。
+Brief description of what this PR does.
 
-建议提供给 reviewer 的材料：
-- 当前 `git diff --stat`
-- 当前 `git diff`
-- 本地验证结果
-- 已知风险 / 未覆盖项
+## Why
 
-如果项目中有 reviewer 请求模板，可直接使用。
+Explain the motivation and context.
+
+## How
+
+Key implementation details worth highlighting.
+
+## Testing
+
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing performed
+
+## Screenshots (if applicable)
+
+Before/after screenshots for UI changes.
+
+## Checklist
+
+- [ ] Code follows project style guidelines
+- [ ] Self-review completed
+- [ ] Comments added for complex logic
+- [ ] Documentation updated
+- [ ] No new warnings introduced
+- [ ] Tests pass locally
+- [ ] Related issues linked
+
+Closes #123
 ```
 
-除非用户明确要求忽略，否则当前会话不得在同一上下文中充当独立 reviewer。
+### Code Review Checklist
 
-### Step 5：提交并推送到正确分支
+**For Reviewers:**
 
-如果已经满足提交前门禁，再执行：
+- [ ] Does the code solve the stated problem?
+- [ ] Are there any edge cases not handled?
+- [ ] Is the code readable and maintainable?
+- [ ] Are there sufficient tests?
+- [ ] Are there security concerns?
+- [ ] Is the commit history clean (squashed if needed)?
+
+**For Authors:**
+
+- [ ] Self-review completed before requesting review
+- [ ] CI passes (tests, lint, typecheck)
+- [ ] PR size is reasonable (<500 lines ideal)
+- [ ] Related to a single feature/fix
+- [ ] Description clearly explains the change
+
+## Conflict Resolution
+
+### Identify Conflicts
 
 ```bash
-git add <relevant-files>
-git commit -m "<type>: <description>"
-git push origin <branch-name>
+# Check for conflicts before merge
+git checkout main
+git merge feature/user-auth --no-commit --no-ff
+
+# If conflicts, Git will show:
+# CONFLICT (content): Merge conflict in src/auth/login.ts
+# Automatic merge failed; fix conflicts and then commit the result.
 ```
 
-执行前再确认一次：
+### Resolve Conflicts
 
-- 不会直推主分支
-- 不会把与当前任务无关的本地改动一并提交
+```bash
+# See conflicted files
+git status
 
-### Step 6：创建或继续推进 PR
+# View conflict markers in file
+# <<<<<<< HEAD
+# content from main
+# =======
+# content from feature branch
+# >>>>>>> feature/user-auth
 
-如果仓库采用 PR 工作流，`push` 后必须继续判断：
+# Option 1: Manual resolution
+# Edit file, remove markers, keep correct content
 
-- 用户是否明确要求停在 `push`
-- 是否已经存在对应 PR
+# Option 2: Use merge tool
+git mergetool
 
-若没有"停在 push"的明确要求：
+# Option 3: Accept one side
+git checkout --ours src/auth/login.ts    # Keep main version
+git checkout --theirs src/auth/login.ts  # Keep feature version
 
-- 无 PR：创建 PR
-- 已有 PR：继续跟进现有 PR
+# After resolving, stage and commit
+git add src/auth/login.ts
+git commit
+```
 
-PR 描述至少应包含：
+### Conflict Prevention Strategies
 
-- 改动目标
-- 关键变更点
-- 本地验证方式
-- reviewer 需要的上下文（可选）
-- 遗留风险
+```bash
+# 1. Keep feature branches small and short-lived
+# 2. Rebase frequently onto main
+git checkout feature/user-auth
+git fetch origin
+git rebase origin/main
 
-如果项目中存在 PR 模版（如 `.github/pull_request_template.md`），应优先使用。
+# 3. Communicate with team about touching shared files
+# 4. Use feature flags instead of long-lived branches
+# 5. Review and merge PRs promptly
+```
 
-### Step 7：等待 CI 并处理反馈
+## Branch Management
 
-创建或定位到 PR 后，默认继续等待并检查：
+### Naming Conventions
 
-- CI 状态
-- review comments
-- reviewer findings
+```
+# Feature branches
+feature/user-authentication
+feature/JIRA-123-payment-integration
 
-等待规则：
+# Bug fixes
+fix/login-redirect-loop
+fix/456-null-pointer-exception
 
-- `queued`、`pending`、`in_progress` 都不算完成
-- 默认持续等待，直到出现终态
-- 超过 15 分钟仍未终态时，只能向用户同步中间进度，不能宣称流程完成
+# Hotfixes (production issues)
+hotfix/critical-security-patch
+hotfix/database-connection-leak
 
-若出现失败或 feedback：
+# Releases
+release/1.2.0
+release/2024-01-hotfix
 
-1. 修复问题
-2. 重跑相关本地验证
-3. 必要时再次发起独立 reviewer
-4. 重新 push
-5. 继续等待 CI / review
+# Experiments/POCs
+experiment/new-caching-strategy
+poc/graphql-migration
+```
 
-### Step 8：收口条件
+### Branch Cleanup
 
-只有满足以下任一条件，才可以把交付类请求视为当前阶段完成：
+```bash
+# Delete local branches that are merged
+git branch --merged main | grep -v "^\*\|main" | xargs -n 1 git branch -d
 
-1. 用户明确要求停在某个中间步骤
-2. PR 已达到可合并状态，且已向用户同步结果
-3. PR 已合并
-4. CI / review 长时间未到终态，已向用户明确说明当前仍在等待中
+# Delete remote-tracking references for deleted remote branches
+git fetch -p
 
-禁止把以下状态误判为完成：
+# Delete local branch
+git branch -d feature/user-auth  # Safe delete (only if merged)
+git branch -D feature/user-auth  # Force delete
 
-- 分支已推送
-- PR 已创建
-- CI 已触发但仍在排队
+# Delete remote branch
+git push origin --delete feature/user-auth
+```
 
-## 输出要求
+### Stash Workflow
 
-处理交付类请求时，优先同步"当前处于哪一步、下一步是什么"，例如：
+```bash
+# Save work in progress
+git stash push -m "WIP: user authentication"
 
-- 当前已完成本地验证，下一步需要新开会话执行 reviewer
-- 当前 reviewer 已把结果写回 PR，下一步将读取 PR review findings 并决定修复或继续等待
-- 当前已 push 分支，下一步将创建 PR
-- 当前 PR 已创建，正在等待 CI
-- 当前 CI 失败，下一步将修复并重跑验证
+# List stashes
+git stash list
 
-若流程未结束，不要把中间进度描述成"已完成"。
+# Apply most recent stash
+git stash pop
 
-## 失败与升级条件
+# Apply specific stash
+git stash apply stash@{2}
 
-命中以下任一情况时，不要继续盲推：
+# Drop stash
+git stash drop stash@{0}
+```
 
-- 关键本地验证未通过
-- 独立 reviewer 给出 `REQUEST_CHANGES`
-- 当前分支或提交范围不清晰
-- PR / CI 状态无法确认
-- 远端规则与本地预期冲突
+## Release Management
 
-命中以下情况时，建议升级为人工判断：
+### Semantic Versioning
 
-- 权限、认证、敏感数据、外部系统关键链路改动
-- reviewer / CI 出现难以解释的异常
-- 需求本身仍存在歧义，无法仅靠代码与文档判断
+```
+MAJOR.MINOR.PATCH
+
+MAJOR: Breaking changes
+MINOR: New features, backward compatible
+PATCH: Bug fixes, backward compatible
+
+Examples:
+1.0.0 → 1.0.1 (patch: bug fix)
+1.0.1 → 1.1.0 (minor: new feature)
+1.1.0 → 2.0.0 (major: breaking change)
+```
+
+### Creating Releases
+
+```bash
+# Create annotated tag
+git tag -a v1.2.0 -m "Release v1.2.0
+
+Features:
+- Add user authentication
+- Implement password reset
+
+Fixes:
+- Resolve login redirect issue
+
+Breaking Changes:
+- None"
+
+# Push tag to remote
+git push origin v1.2.0
+
+# List tags
+git tag -l
+
+# Delete tag
+git tag -d v1.2.0
+git push origin --delete v1.2.0
+```
+
+### Changelog Generation
+
+```bash
+# Generate changelog from commits
+git log v1.1.0..v1.2.0 --oneline --no-merges
+
+# Or use conventional-changelog
+npx conventional-changelog -i CHANGELOG.md -s
+```
+
+## Git Configuration
+
+### Essential Configs
+
+```bash
+# User identity
+git config --global user.name "Your Name"
+git config --global user.email "your@email.com"
+
+# Default branch name
+git config --global init.defaultBranch main
+
+# Pull behavior (rebase instead of merge)
+git config --global pull.rebase true
+
+# Push behavior (push current branch only)
+git config --global push.default current
+
+# Auto-correct typos
+git config --global help.autocorrect 1
+
+# Better diff algorithm
+git config --global diff.algorithm histogram
+
+# Color output
+git config --global color.ui auto
+```
+
+### Useful Aliases
+
+```bash
+# Add to ~/.gitconfig
+[alias]
+    co = checkout
+    br = branch
+    ci = commit
+    st = status
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = log --oneline --graph --all
+    amend = commit --amend --no-edit
+    wip = commit -m "WIP"
+    undo = reset --soft HEAD~1
+    contributors = shortlog -sn
+```
+
+### Gitignore Patterns
+
+```gitignore
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+*.o
+*.exe
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test coverage
+coverage/
+
+# Cache
+.cache/
+*.tsbuildinfo
+```
+
+## Common Workflows
+
+### Starting a New Feature
+
+```bash
+# 1. Update main branch
+git checkout main
+git pull origin main
+
+# 2. Create feature branch
+git checkout -b feature/user-auth
+
+# 3. Make changes and commit
+git add .
+git commit -m "feat(auth): implement OAuth2 login"
+
+# 4. Push to remote
+git push -u origin feature/user-auth
+
+# 5. Create Pull Request on GitHub/GitLab
+```
+
+### Updating a PR with New Changes
+
+```bash
+# 1. Make additional changes
+git add .
+git commit -m "feat(auth): add error handling"
+
+# 2. Push updates
+git push origin feature/user-auth
+```
+
+### Syncing Fork with Upstream
+
+```bash
+# 1. Add upstream remote (once)
+git remote add upstream https://github.com/original/repo.git
+
+# 2. Fetch upstream
+git fetch upstream
+
+# 3. Merge upstream/main into your main
+git checkout main
+git merge upstream/main
+
+# 4. Push to your fork
+git push origin main
+```
+
+### Undoing Mistakes
+
+```bash
+# Undo last commit (keep changes)
+git reset --soft HEAD~1
+
+# Undo last commit (discard changes)
+git reset --hard HEAD~1
+
+# Undo last commit pushed to remote
+git revert HEAD
+git push origin main
+
+# Undo specific file changes
+git checkout HEAD -- path/to/file
+
+# Fix last commit message
+git commit --amend -m "New message"
+
+# Add forgotten file to last commit
+git add forgotten-file
+git commit --amend --no-edit
+```
+
+## Git Hooks
+
+### Pre-Commit Hook
+
+```bash
+#!/bin/bash
+# .git/hooks/pre-commit
+
+# Run linting
+npm run lint || exit 1
+
+# Run tests
+npm test || exit 1
+
+# Check for secrets
+if git diff --cached | grep -E '(password|api_key|secret)'; then
+    echo "Possible secret detected. Commit aborted."
+    exit 1
+fi
+```
+
+### Pre-Push Hook
+
+```bash
+#!/bin/bash
+# .git/hooks/pre-push
+
+# Run full test suite
+npm run test:all || exit 1
+
+# Check for console.log statements
+if git diff origin/main | grep -E 'console\.log'; then
+    echo "Remove console.log statements before pushing."
+    exit 1
+fi
+```
+
+## Anti-Patterns
+
+```
+# BAD: Committing directly to main
+git checkout main
+git commit -m "fix bug"
+
+# GOOD: Use feature branches and PRs
+
+# BAD: Committing secrets
+git add .env  # Contains API keys
+
+# GOOD: Add to .gitignore, use environment variables
+
+# BAD: Giant PRs (1000+ lines)
+# GOOD: Break into smaller, focused PRs
+
+# BAD: "Update" commit messages
+git commit -m "update"
+git commit -m "fix"
+
+# GOOD: Descriptive messages
+git commit -m "fix(auth): resolve redirect loop after login"
+
+# BAD: Rewriting public history
+git push --force origin main
+
+# GOOD: Use revert for public branches
+git revert HEAD
+
+# BAD: Long-lived feature branches (weeks/months)
+# GOOD: Keep branches short (days), rebase frequently
+
+# BAD: Committing generated files
+git add dist/
+git add node_modules/
+
+# GOOD: Add to .gitignore
+```
+
+## Quick Reference
+
+| Task | Command |
+|------|---------|
+| Create branch | `git checkout -b feature/name` |
+| Switch branch | `git checkout branch-name` |
+| Delete branch | `git branch -d branch-name` |
+| Merge branch | `git merge branch-name` |
+| Rebase branch | `git rebase main` |
+| View history | `git log --oneline --graph` |
+| View changes | `git diff` |
+| Stage changes | `git add .` or `git add -p` |
+| Commit | `git commit -m "message"` |
+| Push | `git push origin branch-name` |
+| Pull | `git pull origin branch-name` |
+| Stash | `git stash push -m "message"` |
+| Undo last commit | `git reset --soft HEAD~1` |
+| Revert commit | `git revert HEAD` |

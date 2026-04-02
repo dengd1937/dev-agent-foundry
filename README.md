@@ -1,8 +1,8 @@
-# dev-agent-foundry
+# meridian
 
-面向现代开发工作流的跨工具 dev-agent 能力底座。
+面向现代开发工作流的跨工具 AI Coding 规范基准线。
 
-`dev-agent-foundry` 的目标，是把之前在 `sre-copilot` 中验证过的一些通用经验沉淀出来，整理成可复用的规则层和共享 skill 层，方便新项目直接接入，并尽量减少对单一工具协议的绑定。
+`meridian` 的目标，是把之前在 `sre-copilot` 中验证过的一些通用经验沉淀出来，整理成可复用的规则层和共享 skill 层，方便新项目直接接入，并尽量减少对单一工具协议的绑定。
 
 当前组织方向更明确偏向 `everything-claude-code` 的规则分层方式，同时保留 `sre-copilot` 那种可以直接复制使用的 skill 目录体验。
 
@@ -24,7 +24,7 @@
 ## 目录结构
 
 ```text
-dev-agent-foundry/
+meridian/
 ├── AGENTS.md
 ├── .agents/
 │   └── skills/
@@ -94,7 +94,7 @@ cp -r .agents/skills/* /your-project/.agents/skills/
 
 ```bash
 cd /your-project
-git submodule add https://github.com/dengd1937/dev-agent-foundry.git .agents/dev-agent-foundry
+git submodule add https://github.com/dengd1937/meridian.git .agents/meridian
 ```
 
 ### 方式三：手动同步
