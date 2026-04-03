@@ -12,20 +12,23 @@ This is a **production-ready AI coding plugin** providing 36 specialized agents,
 
 ## Available Agents
 
-| Agent | Purpose | When to Use |
-|-------|---------|-------------|
-| planner | Implementation planning | Complex features, refactoring |
-| tdd-guide | Test-driven development | New features, bug fixes |
-| code-reviewer | Code quality and maintainability | After writing/modifying code |
-| security-reviewer | Vulnerability detection | Before commits, sensitive code |
-| refactor-cleaner | Dead code cleanup | Code maintenance |
-| doc-updater | Documentation and codemaps | Updating docs |
-| docs-lookup | Documentation lookup via Context7 | API/docs questions |
-| python-reviewer | Python code review | Python projects |
+
+| Agent             | Purpose                           | When to Use                    |
+| ----------------- | --------------------------------- | ------------------------------ |
+| planner           | Implementation planning           | Complex features, refactoring  |
+| tdd-guide         | Test-driven development           | New features, bug fixes        |
+| code-reviewer     | Code quality and maintainability  | After writing/modifying code   |
+| security-reviewer | Vulnerability detection           | Before commits, sensitive code |
+| refactor-cleaner  | Dead code cleanup                 | Code maintenance               |
+| doc-updater       | Documentation and codemaps        | Updating docs                  |
+| docs-lookup       | Documentation lookup via Context7 | API/docs questions             |
+| python-reviewer   | Python code review                | Python projects                |
+
 
 ## Agent Orchestration
 
 Use agents proactively without user prompt:
+
 - Complex feature requests → **planner**
 - Code just written/modified → **code-reviewer**
 - Bug fix or new feature → **tdd-guide**
@@ -36,6 +39,7 @@ Use parallel execution for independent operations — launch multiple agents sim
 ## Security Guidelines
 
 **Before ANY commit:**
+
 - No hardcoded secrets (API keys, passwords, tokens)
 - All user inputs validated
 - SQL injection prevention (parameterized queries)
@@ -60,6 +64,7 @@ Use parallel execution for independent operations — launch multiple agents sim
 **Input validation:** Validate all user input at system boundaries. Use schema-based validation. Fail fast with clear messages. Never trust external data.
 
 **Code quality checklist:**
+
 - Functions small (<50 lines), files focused (<800 lines)
 - No deep nesting (>4 levels)
 - Proper error handling, no hardcoded values
@@ -70,11 +75,13 @@ Use parallel execution for independent operations — launch multiple agents sim
 **Minimum coverage: 80%**
 
 Test types (all required):
+
 1. **Unit tests** — Individual functions, utilities, components
 2. **Integration tests** — API endpoints, database operations
 3. **E2E tests** — Critical user flows
 
 **TDD workflow (mandatory):**
+
 1. Write test first (RED) — test should FAIL
 2. Write minimal implementation (GREEN) — test should PASS
 3. Refactor (IMPROVE) — verify coverage 80%+
@@ -86,6 +93,7 @@ Troubleshoot failures: check test isolation → verify mocks → fix implementat
 See [.agents/rules/development-workflow.md](.agents/rules/development-workflow.md) for the complete 8-step feature implementation workflow.
 
 **Quick reference:**
+
 1. Research & Reuse → 2. Plan First → 3. TDD Approach → 4. Quality Gate → 5. Code Review → 6. Documentation Decision → 7. Commit & Push → 8. Pre-Review Checks
 
 ## Git Workflow
@@ -109,3 +117,4 @@ See [.agents/rules/development-workflow.md](.agents/rules/development-workflow.m
 - Code is readable and maintainable
 - Performance is acceptable
 - User requirements are met
+

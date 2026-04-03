@@ -19,8 +19,10 @@ The Feature Implementation Workflow describes the development pipeline: research
    - Save planning doc to `docs/plans/<feature-name>.md` before coding
    - Identify dependencies and risks
    - Break down into phases
+   - **[Hard Gate]** Present the plan to the user for approval before proceeding — **do not write any code until the user explicitly approves**
 
 3. **TDD Approach**
+   - If fixing a bug, run **investigate** skill first before writing any fix code
    - Use **tdd-guide** agent
    - Write tests first (RED)
    - Implement to pass tests (GREEN)
