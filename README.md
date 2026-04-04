@@ -30,6 +30,8 @@ meridian/
 │   └── skills/
 │       ├── code-quality-gate/
 │       ├── commit-quality/
+│       ├── design-review/
+│       ├── design-review-codex/
 │       ├── git-workflow/
 │       ├── tdd-workflow/
 │       ├── django-security/
@@ -64,6 +66,8 @@ meridian/
 | [django-security](.agents/skills/django-security/SKILL.md) | Django 认证鉴权、CSRF/XSS/SQL 注入、生产安全配置 |
 | [investigate](.agents/skills/investigate/SKILL.md) | Bug 根因调查门禁 — 假设优先调试，禁止无调查改代码 |
 | [retro](.agents/skills/retro/SKILL.md) | 任务复盘 — 审视流程遵守、决策路径与 AI 行为，提出改进建议 |
+| [design-review](.agents/skills/design-review/SKILL.md) | 方案对抗性审查 — 在批准前压力测试架构、可行性、测试、性能与范围 |
+| [design-review-codex](.agents/skills/design-review-codex/SKILL.md) | 通过 Codex 获取独立跨模型方案审查（Claude Code 专用） |
 
 ## 当前 Claude Code Agents
 

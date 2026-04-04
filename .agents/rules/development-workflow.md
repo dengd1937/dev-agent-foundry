@@ -20,6 +20,7 @@ The Feature Implementation Workflow describes the development pipeline: research
    - Identify dependencies and risks
    - Break down into phases
    - **[Hard Gate]** Present the plan to the user for approval before proceeding — **do not write any code until the user explicitly approves**
+   - _Optional:_ For complex plans, run **design-review** skill before approval for adversarial review (Claude Code users can also use **design-review-codex** for independent cross-model analysis)
 
 3. **TDD Approach**
    - If fixing a bug, run **investigate** skill first before writing any fix code
