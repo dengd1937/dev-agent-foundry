@@ -6,7 +6,7 @@ origin: meridian
 
 # Ideate
 
-将模糊的产品想法精炼为结构化的产品定义，输出可直接对接 Design Workflow (D1) 和 Development Workflow (Step 1) 的文档。
+将模糊的产品想法精炼为结构化的产品定义，输出可直接对接 Design Workflow v2（L1 / V2-1）和 Development Workflow (Step 1) 的文档。
 
 ## When to Activate
 
@@ -220,8 +220,8 @@ MVP 范围 = P0 功能集合，目标是 [一句话描述 MVP 交付的核心价
    - 是 → 继续
 
 2. UI 复杂度如何？
-   - 小改动（按钮、文案、布局微调）→ 轻量设计，直接 Development Workflow
-   - 新页面/新组件/新交互 → 完整 Design Workflow (D1-D5) + Development Workflow
+   - 小改动（按钮、文案、布局微调）→ L1 轻量设计 → Development Workflow
+   - 新页面/新组件/新交互 → L2 标准设计流程 (V2-1 到 V2-4) + Development Workflow
 ```
 
 **输出 1：路由决策（在对话中确认）**
@@ -229,18 +229,18 @@ MVP 范围 = P0 功能集合，目标是 [一句话描述 MVP 交付的核心价
 ```
 ## 路由决策
 
-后续工作流：[Design Workflow D1-D5 → Development Workflow]
+后续工作流：[Design Workflow L2 (V2-1 -> V2-4) -> Development Workflow]
            / [Development Workflow 直接开始]
-           / [轻量设计 → Development Workflow]
+           / [L1 轻量设计 -> Development Workflow]
 
 理由：[一句话]
 ```
 
 > **注意：** Output 2 和 Output 3 源自相同的 Phase 1-3 输出。Output 2 面向设计（UI 范围、用户流程），Output 3 面向工程（MVP 范围、优先级、风险）。确保两份文档内容一致。
 
-**输出 2：产品定义（给 Design Workflow D1）**
+**输出 2：产品定义（给 Design Workflow V2-1）**
 
-写入 `docs/plans/<feature-name>-product-brief.md`（仅当需要 Design Workflow 时）。此文件是 D1 的输入，D1 在其基础上生成 `docs/plans/<feature>-design.md`（design intent document），两者是不同文件。
+写入 `docs/plans/<feature-name>-product-brief.md`（仅当需要 L2 标准设计流程时）。此文件是 `V2-1` 的输入，`V2-1` 在其基础上生成 `designs/<feature>/intent.md`，两者是不同文件。
 
 ```markdown
 # [Feature Name] — Design Brief
@@ -386,9 +386,9 @@ MVP 范围 = P0 功能集合，目标是 [一句话描述 MVP 交付的核心价
 ```
 /ideate
   │
-  ├─ 输出 -product-brief.md → Design Workflow D1 (Design Discovery)
-  │                            D1 消费：UI 范围、用户流程、功能清单、竞品参考
-  │                            D1 输出：-design.md（design intent document，独立文件）
+  ├─ 输出 -product-brief.md → Design Workflow V2-1 (Design Intent)
+  │                            V2-1 消费：UI 范围、用户流程、功能清单、竞品参考
+  │                            V2-1 输出：designs/<feature>/intent.md（design intent document）
   │
   └─ 输出 .md ──────→ Development Workflow Step 1 (Research & Reuse)
                          Step 1 消费：MVP 范围、功能优先级、竞品分析、技术约束

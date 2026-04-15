@@ -16,7 +16,7 @@ Located in `~/.claude/agents/`:
 | python-reviewer | Python code review | Python projects |
 | typescript-reviewer | TypeScript/React code review | TypeScript/Next.js projects |
 | e2e-runner | Browser E2E testing | Critical user flow changes |
-| design-reviewer | Design artifact review | Before design handoff (D5 gate) |
+| design-reviewer | Design artifact review | Before design handoff (V2-4 final gate) |
 
 ## Immediate Agent Usage
 

@@ -1,6 +1,6 @@
 # Variables and Design Tokens
 
-> Workflow step: **D3. Design Tokens**
+> Workflow step: **V2-2 / V2-3. Design Tokens**
 
 Covers reading, creating, and mapping Pencil variables to the Style Dictionary token pipeline.
 
@@ -28,6 +28,71 @@ Returns flat key-value pairs:
   }
 }
 ```
+
+## Naming Convention
+
+All tokens across all features MUST follow this canonical naming convention. This prevents token name drift (e.g., `primary` vs `brand` vs `color-primary`) that fragments the design system.
+
+### Rules
+
+1. **kebab-case only** — use hyphens as separators. Never camelCase or snake_case.
+2. **Semantic names, not visual names** — `primary` not `blue`, `destructive` not `red`, `muted-foreground` not `gray-500`.
+3. **Foreground pairs use `-foreground` suffix** — `primary` + `primary-foreground`, `card` + `card-foreground`. Never `primary-text` or `on-primary`.
+4. **Scale uses `-sm/md/lg/xl` suffix** — `radius-md`, `spacing-lg`, `shadow-sm`. Never `radius-medium` or `radius2`.
+5. **Prefix by category for non-color tokens** — `radius-*`, `spacing-*`, `shadow-*`, `font-*`, `text-*`, `breakpoint-*`. Colors are the exception: they use the semantic name directly (`primary`, not `color-primary`).
+6. **Never use feature-specific names** — a token in `designs/alerts/` named `alert-red` is wrong. Use a shared `destructive` token instead.
+
+### Canonical Names Reference
+
+| Category | Token Name | Purpose |
+|----------|-----------|---------|
+| Brand color | `primary` | Primary brand color |
+| Brand color | `primary-foreground` | Text/icon color on primary background |
+| Brand color | `secondary` | Secondary brand color |
+| Brand color | `secondary-foreground` | Text/icon color on secondary background |
+| Brand color | `accent` | Accent highlight color |
+| Brand color | `accent-foreground` | Text/icon color on accent background |
+| Semantic color | `destructive` | Error, delete, dangerous action |
+| Semantic color | `destructive-foreground` | Text/icon color on destructive background |
+| Semantic color | `success` | Confirmation, completed state |
+| Semantic color | `success-foreground` | Text/icon color on success background |
+| Semantic color | `warning` | Caution, attention |
+| Semantic color | `warning-foreground` | Text/icon color on warning background |
+| Surface color | `background` | Default page background |
+| Surface color | `foreground` | Default text color on background |
+| Surface color | `card` | Card / elevated surface background |
+| Surface color | `card-foreground` | Text color on card background |
+| Surface color | `popover` | Popover / tooltip / menu background |
+| Surface color | `popover-foreground` | Text color on popover background |
+| Surface color | `muted` | Subdued background (disabled, placeholder area) |
+| Surface color | `muted-foreground` | Subdued text color |
+| UI color | `border` | Default border color |
+| UI color | `input` | Form input border color |
+| UI color | `ring` | Focus ring color |
+| Typography | `font-sans` | Default sans-serif family |
+| Typography | `font-mono` | Monospace family |
+| Typography | `font-heading` | Heading family (if distinct from sans) |
+| Typography | `text-xs` / `text-sm` / `text-base` / `text-lg` / `text-xl` | Font size scale |
+| Border radius | `radius-sm` / `radius-md` / `radius-lg` / `radius-xl` | Border radius scale |
+| Spacing | `spacing-xs` / `spacing-sm` / `spacing-md` / `spacing-lg` / `spacing-xl` / `spacing-2xl` | Spacing scale |
+| Shadow | `shadow-sm` / `shadow-md` / `shadow-lg` / `shadow-xl` | Elevation scale |
+| Breakpoint | `breakpoint-sm` / `breakpoint-md` / `breakpoint-lg` / `breakpoint-xl` | Responsive thresholds |
+
+### Forbidden Names
+
+| Bad | Why | Use Instead |
+|-----|-----|-------------|
+| `brand-primary` | Redundant prefix | `primary` |
+| `color-primary` | Category prefix not used for colors | `primary` |
+| `primary-text` | Wrong foreground convention | `primary-foreground` |
+| `on-primary` | Material Design convention, not shadcn | `primary-foreground` |
+| `red-500` | Visual name, not semantic | `destructive` |
+| `radius-medium` | Use scale suffix | `radius-md` |
+| `gray-bg` | Not semantic | `muted` |
+| `alert-red` | Feature-specific color | `destructive` |
+| `dashboard-header-bg` | Feature-specific surface | `card` or create a shared surface token |
+
+---
 
 ## Creating Variables
 

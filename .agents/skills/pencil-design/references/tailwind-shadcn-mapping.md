@@ -1,6 +1,6 @@
 # Tailwind + shadcn/ui Mapping Reference
 
-> Workflow step: **D4. Component Specification**
+> Workflow step: **V2-3. Key Component Contracts**
 
 Quick-reference mapping from Pencil design properties to Tailwind v4 + shadcn/ui code.
 

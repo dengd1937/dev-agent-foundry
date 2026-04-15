@@ -1,6 +1,6 @@
 # Responsive Breakpoints
 
-> Workflow step: **D4. Component Specification**
+> Workflow step: **V2-3. Key Component Contracts**
 
 Mapping Pencil multi-artboard designs to Tailwind CSS responsive breakpoints.
 

@@ -1,8 +1,8 @@
 # Component Specification
 
-> Workflow step: **D4. Component Specification**
+> Workflow step: **V2-3. High-Fidelity Design + Key Component Contracts**
 
-Covers capturing high-fidelity designs and writing implementation specifications for each UI component.
+Covers capturing high-fidelity designs and writing implementation contracts for key UI components.
 
 ## Design Refinement
 
@@ -40,21 +40,14 @@ pencil_get_screenshot({
 })
 ```
 
-## Specification Document
+## Component Contract Document
 
-For each component, create a spec document at `designs/<feature>/components/<ComponentName>.md`.
+For each key component, create a contract document at `designs/<feature>/components/<ComponentName>.md`.
 
 ### Template
 
 ```markdown
 # ComponentName
-
-## Props
-\`\`\`typescript
-interface ComponentNameProps {
-  // typed props with descriptions
-}
-\`\`\`
 
 ## Variants
 | Variant | Description | Visual |
@@ -83,11 +76,17 @@ interface ComponentNameProps {
 - Focus management: ...
 - Screen reader: ...
 
-## Animation
-| Transition | Duration | Easing |
-|-----------|----------|--------|
-| hover scale | 150ms | ease-out |
-| appear | 200ms | ease-in-out |
+## Implementation Mapping
+- Base component: `Button` from `@/components/ui/button`
+- Variant system: `cva`
+- Notes: ...
+
+## Design Constraints
+- Must use tokenized spacing only
+- Must preserve icon/text alignment at all breakpoints
+
+## API Notes
+- Optional. Use only when design decisions constrain the public API.
 ```
 
 ## Component-to-shadcn Mapping
@@ -110,25 +109,16 @@ pencil_batch_get({
 3. Document any customizations needed
 4. Verify the shadcn/ui component covers all states
 
-## Props Interface Guidelines
+## API Notes Guidelines
 
-### Naming
+The markdown contract is not the source of truth for a full TypeScript props interface. Source code owns that. Add `## API Notes` only when the design explicitly constrains public behavior.
 
-- Use descriptive, specific names: `alertSeverity` not `type`
-- Boolean props: `isDisabled`, `isLoading`, `hasError`
-- Callback props: `onSelect`, `onClick`, `onChange`
-- Optional props: use `?` with sensible defaults
+Examples:
 
-### Common Prop Categories
-
-| Category | Examples |
-|----------|---------|
-| Data | `title`, `description`, `items`, `value` |
-| Appearance | `variant`, `size`, `className` |
-| State | `isLoading`, `isDisabled`, `hasError` |
-| Behavior | `onClick`, `onChange`, `onSubmit` |
-| Accessibility | `ariaLabel`, `ariaDescribedBy` |
-| Layout | `orientation`, `gap`, `columns` |
+- Which variant values are valid
+- Whether a component must expose an icon slot
+- Whether loading and disabled states are mutually exclusive
+- Which accessibility props must be configurable
 
 ## Responsive Specification
 
@@ -145,7 +135,7 @@ See [responsive-breakpoints.md](responsive-breakpoints.md) for multi-artboard pa
 
 ## Accessibility Requirements
 
-Every component spec must include:
+Every component contract must include:
 
 1. **ARIA roles**: What semantic role does the component play?
 2. **Keyboard navigation**: Can all interactions be performed via keyboard?
@@ -157,12 +147,12 @@ Every component spec must include:
 
 - [ ] High-fidelity design refined on Pencil canvas?
 - [ ] Screenshots captured for all states (default, hover, active, disabled, error, loading)?
-- [ ] Props interface defined with TypeScript types?
 - [ ] Variants documented with visual references?
 - [ ] States documented with triggers and visual changes?
 - [ ] Responsive behavior specified at breakpoints?
 - [ ] Accessibility requirements documented?
 - [ ] Mapped to shadcn/ui equivalent?
+- [ ] Design constraints documented?
 
 ## See Also
 

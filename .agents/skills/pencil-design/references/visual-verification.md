@@ -1,6 +1,6 @@
 # Visual Verification
 
-> Workflow step: **D2. Wireframe & Layout**
+> Workflow step: **V2-2 / V2-4. Visual Verification**
 
 Screenshot-based verification workflow to catch visual issues invisible in the node tree.
 
@@ -115,6 +115,50 @@ Catches programmatic issues:
 | After modifying existing design | The changed section |
 | After bulk property updates | At least one affected area |
 | When comparing variants | Both variants side by side |
+
+## Screenshot Retention and Promotion
+
+Design iterations produce many intermediate screenshots. Committing every one of them bloats the repository with binary files and makes PR review meaningless. Follow this retention policy.
+
+### Two-tier storage
+
+```
+designs/<feature>/screenshots/
+├── *.png                # Final approved screenshots (committed)
+└── .tmp/                # Intermediate iteration screenshots (GITIGNORED)
+```
+
+- `designs/**/screenshots/.tmp/` MUST be listed in `.gitignore`.
+- Save every `pencil_get_screenshot` output to `.tmp/` first.
+- Only **promote** a screenshot to `screenshots/` after the section has been approved by the user.
+
+### Promotion workflow
+
+1. Iterate in `.tmp/`:
+   ```
+   pencil_get_screenshot -> screenshots/.tmp/hero-v1.png
+   pencil_get_screenshot -> screenshots/.tmp/hero-v2.png
+   pencil_get_screenshot -> screenshots/.tmp/hero-v3.png
+   ```
+2. User approves `hero-v3.png`.
+3. **Promote**: move `hero-v3.png` to `screenshots/hero.png` (drop the version suffix — final approved screenshots do not need versioning since git history provides it).
+4. Delete everything else in `.tmp/` for this feature — it's already gitignored, but local cleanup keeps the working copy tidy.
+
+### What gets a final screenshot
+
+Only these artifacts deserve a committed screenshot in `screenshots/`:
+
+- The final approved wireframe (from V2-2): `wireframe.png`
+- One screenshot per key component variant (from V2-3): `<component>-<variant>.png`
+- The final full-page design (from V2-4): `<screen>-desktop.png`, `<screen>-mobile.png`
+
+Do NOT commit screenshots of intermediate iterations, exploration, or process snapshots.
+
+### Naming convention
+
+- Use lowercase, kebab-case: `alert-card-critical.png`, not `AlertCard_Critical.PNG`
+- No version suffixes in committed filenames: `button.png`, not `button-v3-final.png`
+- Breakpoint variants use suffix: `dashboard-mobile.png`, `dashboard-desktop.png`
 
 ## Common Issues Found Only Through Screenshots
 

@@ -1,6 +1,6 @@
 ---
 name: pencil-design
-description: Design UIs in Pencil (.pen files) and generate production code. Activates for tasks involving Pencil MCP tools, .pen files, design-to-code workflows, or UI design with Pencil. Integrates with the design-workflow.md D1-D5 steps.
+description: Design UIs in Pencil (.pen files) and generate production code. Activates for tasks involving Pencil MCP tools, .pen files, design-to-code workflows, or UI design with Pencil. Integrates with the design-workflow.md v2 stages for wireframing, token work, and high-fidelity design.
 metadata:
   author: sre-copilot
   version: "1.0"
@@ -11,7 +11,7 @@ metadata:
 
 # Pencil Design Skill
 
-Design production-quality UIs in Pencil and generate clean, maintainable code from them. This skill provides the execution layer for the [design workflow](/.agents/rules/design-workflow.md) steps D2-D4.
+Design production-quality UIs in Pencil and generate clean, maintainable code from them. This skill provides the execution layer for the [design workflow](/.agents/rules/design-workflow.md) stages `V2-2` and `V2-3`.
 
 ## When to Use This Skill
 
@@ -27,13 +27,13 @@ This skill is the execution layer for the design workflow. Each reference docume
 
 | Workflow Step | Reference Document |
 |---------------|-------------------|
-| D2. Wireframe & Layout | [wireframe-and-layout.md](references/wireframe-and-layout.md) |
-| D2. Visual Verification | [visual-verification.md](references/visual-verification.md) |
-| D3. Design Tokens | [tokens-and-variables.md](references/tokens-and-variables.md) |
-| D4. Component Specification | [component-specification.md](references/component-specification.md) |
-| D4. Design-to-Code | [design-to-code-workflow.md](references/design-to-code-workflow.md) |
-| D4. Component Mapping | [tailwind-shadcn-mapping.md](references/tailwind-shadcn-mapping.md) |
-| D4. Responsive Layout | [responsive-breakpoints.md](references/responsive-breakpoints.md) |
+| V2-2. Wireframe + Baseline Tokens | [wireframe-and-layout.md](references/wireframe-and-layout.md) |
+| V2-2 / V2-4. Visual Verification | [visual-verification.md](references/visual-verification.md) |
+| V2-2 / V2-3. Design Tokens | [tokens-and-variables.md](references/tokens-and-variables.md) |
+| V2-3. Key Component Contracts | [component-specification.md](references/component-specification.md) |
+| V2-3. Design-to-Code | [design-to-code-workflow.md](references/design-to-code-workflow.md) |
+| V2-3. Component Mapping | [tailwind-shadcn-mapping.md](references/tailwind-shadcn-mapping.md) |
+| V2-3. Responsive Layout | [responsive-breakpoints.md](references/responsive-breakpoints.md) |
 
 ## Critical Rules
 
@@ -131,7 +131,7 @@ Consult [tailwind-shadcn-mapping.md](references/tailwind-shadcn-mapping.md) for 
 
 ## Workflow Summary
 
-### New Design (D2)
+### Wireframe + Baseline Tokens (V2-2)
 
 ```
 1. pencil_get_editor_state        -> Understand file state
@@ -144,7 +144,7 @@ Consult [tailwind-shadcn-mapping.md](references/tailwind-shadcn-mapping.md) for 
 8. pencil_snapshot_layout         -> Check for problems
 ```
 
-### Token Pipeline (D3)
+### Token Pipeline (V2-3)
 
 ```
 1. pencil_set_variables           -> Define tokens in Pencil
@@ -155,7 +155,7 @@ Consult [tailwind-shadcn-mapping.md](references/tailwind-shadcn-mapping.md) for 
 
 See [tokens-and-variables.md](references/tokens-and-variables.md) for full pipeline details.
 
-### Design-to-Code (D4)
+### Design-to-Code (V2-3)
 
 ```
 1. Follow shadcn/ui aesthetic direction (see Rule 6)

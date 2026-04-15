@@ -1,6 +1,6 @@
 # Wireframe and Layout
 
-> Workflow step: **D2. Wireframe & Layout**
+> Workflow step: **V2-2. Wireframe + Baseline Tokens**
 
 Covers component discovery, layout construction, and overflow prevention for building wireframes on the Pencil canvas.
 

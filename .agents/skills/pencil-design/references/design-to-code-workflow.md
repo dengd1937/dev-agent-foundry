@@ -1,6 +1,6 @@
 # Design-to-Code Workflow
 
-> Workflow step: **D4. Component Specification**
+> Workflow step: **V2-3. High-Fidelity Design + Key Component Contracts**
 
 Complete workflow for generating React + Tailwind v4 + shadcn/ui code from Pencil designs.
 
@@ -77,6 +77,42 @@ pencil_batch_get({
 | Alert | `Alert`, `AlertTitle`, `AlertDescription` | `@/components/ui/alert` |
 | Switch / Toggle | `Switch` | `@/components/ui/switch` |
 | Tooltip | `Tooltip`, `TooltipTrigger`, `TooltipContent` | `@/components/ui/tooltip` |
+
+### Fallback Priority (When the Mapping Table Does Not Cover a Component)
+
+Not every Pencil component has a shadcn/ui equivalent. When the table above does not cover a component, follow this priority chain in order — **do NOT skip steps and jump straight to handrolling**. Custom components are the most expensive to maintain.
+
+| Priority | Source | When to Use | Example |
+|----------|--------|-------------|---------|
+| 1 | **shadcn/ui official** | Always check first | `Button`, `Card`, `Dialog` |
+| 2 | **shadcn/ui registry (community)** | Official doesn't cover it; a community block does | `npx shadcn@latest add <url>` |
+| 3 | **tremor** | Charts, analytics, KPIs, dashboards | `BarChart`, `AreaChart`, `Metric` |
+| 4 | **magicui / aceternity-ui** | Animated sections, marketing flourishes | `AnimatedBeam`, `Meteors` |
+| 5 | **Radix UI primitives** | Complex interactive widget with no higher-level component | Wrap `Radix Toolbar` with Tailwind + CVA |
+| 6 | **Handroll** | **Last resort only.** Requires justification in the component spec for why options 1–5 don't fit. | Custom domain widget like `IncidentTimeline` |
+
+#### Documenting Fallback in Component Spec
+
+If a component falls to priority 3+, the component spec MUST include a brief justification:
+
+```markdown
+## Source
+Library: tremor
+Component: `BarChart`
+Justification: shadcn/ui does not ship a chart component. tremor is the standard for analytics in the shadcn ecosystem.
+```
+
+For priority 6 (handroll), the justification must explicitly cite the failed alternatives:
+
+```markdown
+## Source
+Handrolled
+Justification:
+- shadcn/ui has no timeline component
+- tremor's `Tracker` displays progress, not events
+- Radix does not expose a timeline primitive
+- Domain semantics (incident duration, severity, operator) are too specific to reuse
+```
 
 ## Step 6: Generate Code
 
