@@ -27,6 +27,18 @@ No user prompt needed:
 4. Critical user flow changes - Use **e2e-runner** agent
 5. Design artifacts ready for review - Use **design-reviewer** agent
 6. Bug reported or unexpected behavior - Use **investigate** skill first
+7. Vague product idea needs refinement - Use **ideate** skill (`/ideate`)
+
+## Key Skills
+
+Located in `.agents/skills/`:
+
+| Skill | Purpose | When to Use |
+|-------|---------|-------------|
+| ideate | Product idea refinement | Vague idea → structured product definition |
+| investigate | Root-cause analysis | Before any bug fix |
+| design-review | Plan adversarial review | Before implementation, after planner |
+| retro | Post-task retrospective | After feature/fix completion |
 
 ## Parallel Task Execution
 
