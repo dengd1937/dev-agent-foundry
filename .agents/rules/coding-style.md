@@ -276,3 +276,126 @@ const validated: UserInput = userSchema.parse(input)
 - No ad-hoc console debugging statements in production code
 - Use proper logging libraries instead
 - See hooks for automatic detection
+
+### Tailwind CSS v4
+
+#### Semantic Classes Only
+
+NEVER use arbitrary values. Always use semantic Tailwind utilities that map to design tokens.
+
+```typescript
+// WRONG: Arbitrary values bypass the design system
+<div className="bg-[#3b82f6] rounded-[6px] p-[24px] text-[14px]">
+
+// CORRECT: Semantic classes reference design tokens
+<div className="bg-primary rounded-md p-6 text-sm">
+```
+
+#### CSS Theme Configuration
+
+Use Tailwind v4 `@theme` blocks in CSS, not `tailwind.config.ts`:
+
+```css
+/* CORRECT: Tailwind v4 @theme block */
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(0.6 0.2 260);
+  --color-destructive: oklch(0.6 0.2 25);
+  --radius-md: 0.375rem;
+  --font-sans: "Inter", sans-serif;
+}
+```
+
+```typescript
+// WRONG: Tailwind v3 config file (do not use with v4)
+// tailwind.config.ts
+export default { theme: { extend: { ... } } }
+```
+
+#### Class Merging with cn()
+
+Always use `cn()` from `@/lib/utils` to merge classes. Never concatenate class strings manually.
+
+```typescript
+import { cn } from "@/lib/utils"
+
+// WRONG: String concatenation or template literals
+<div className={"card " + (active ? "active" : "")}>
+<div className={`card ${active ? "active" : ""}`}>
+
+// CORRECT: cn() handles conflicts and conditionals
+<div className={cn("rounded-md border", active && "ring-2 ring-primary")}>
+```
+
+### shadcn/ui Components
+
+#### Import Convention
+
+Import shadcn/ui components from `@/components/ui/`. Do not recreate components that shadcn already provides.
+
+```typescript
+// CORRECT: Use shadcn/ui components
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
+```
+
+#### Component Extension
+
+Extend shadcn/ui components for project-specific needs. Use CVA (class-variance-authority) for variants:
+
+```typescript
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+
+const buttonVariants = cva("inline-flex items-center justify-center", {
+  variants: {
+    intent: {
+      primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+      destructive: "bg-destructive text-destructive-foreground",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+    },
+    size: {
+      sm: "h-8 px-3 text-xs",
+      md: "h-10 px-4 text-sm",
+      lg: "h-12 px-6 text-base",
+    },
+  },
+  defaultVariants: {
+    intent: "primary",
+    size: "md",
+  },
+})
+```
+
+#### Icons
+
+Use Lucide React icons. Do not use Material Icons or other icon libraries.
+
+```typescript
+// CORRECT
+import { AlertTriangle, Check, X } from "lucide-react"
+
+// WRONG
+import WarningIcon from "@mui/icons-material/Warning"
+```
+
+### Lint Configuration
+
+Enforce Tailwind/shadcn constraints at lint time:
+
+```bash
+npm install --save-dev eslint-plugin-tailwindcss
+```
+
+```javascript
+// eslint.config.js — prevent arbitrary Tailwind values
+{
+  rules: {
+    "tailwindcss/no-custom-classname": "error",  // blocks bg-[#hex], w-[375px], etc.
+    "tailwindcss/classnames-order": "warn",       // consistent class ordering
+  }
+}
+```

@@ -16,6 +16,7 @@ Located in `~/.claude/agents/`:
 | python-reviewer | Python code review | Python projects |
 | typescript-reviewer | TypeScript/React code review | TypeScript/Next.js projects |
 | e2e-runner | Browser E2E testing | Critical user flow changes |
+| design-reviewer | Design artifact review | Before design handoff (D5 gate) |
 
 ## Immediate Agent Usage
 
@@ -24,7 +25,8 @@ No user prompt needed:
 2. Code just written/modified - Use **code-reviewer** agent
 3. Bug fix or new feature - Use **tdd-guide** agent
 4. Critical user flow changes - Use **e2e-runner** agent
-5. Bug reported or unexpected behavior - Use **investigate** skill first
+5. Design artifacts ready for review - Use **design-reviewer** agent
+6. Bug reported or unexpected behavior - Use **investigate** skill first
 
 ## Parallel Task Execution
 

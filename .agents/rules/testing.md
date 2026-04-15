@@ -160,6 +160,58 @@ test('user login flow', async ({ page }) => {
 })
 ```
 
+### Visual Regression Testing
+
+Use Playwright's built-in screenshot comparison to catch unintended visual changes:
+
+```typescript
+import { test, expect } from '@playwright/test'
+
+test('dashboard visual regression', async ({ page }) => {
+  await page.goto('/dashboard')
+  await expect(page).toHaveScreenshot('dashboard-full.png', {
+    maxDiffPixelRatio: 0.01,
+  })
+})
+
+test('alert card component states', async ({ page }) => {
+  for (const variant of ['default', 'critical', 'warning']) {
+    await page.goto(`/components/alert-card?variant=${variant}`)
+    await expect(page.getByTestId('alert-card')).toHaveScreenshot(
+      `alertcard-${variant}.png`,
+      { maxDiffPixelRatio: 0.01 }
+    )
+  }
+})
+```
+
+Baseline screenshots are committed to the repository. On failure, Playwright generates a diff image for review.
+
+### Accessibility Testing
+
+Use **axe-core** via `@axe-core/playwright` for automated WCAG 2.1 AA compliance checks:
+
+```typescript
+import { test, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+
+test('dashboard accessibility', async ({ page }) => {
+  await page.goto('/dashboard')
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa'])
+    .analyze()
+  expect(results.violations).toEqual([])
+})
+```
+
+Automated checks cover: color contrast, ARIA attributes, semantic HTML, keyboard focus order, form labels. Manual review is still needed for: keyboard navigation flow, screen reader announcements, focus trap in modals.
+
+Dependencies:
+
+```bash
+npm install --save-dev @axe-core/playwright
+```
+
 ### Test Organization
 
 Group tests with `describe` by feature, co-locate test files with source:

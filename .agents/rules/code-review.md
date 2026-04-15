@@ -26,12 +26,8 @@ Before requesting review, ensure:
 
 Before marking code complete:
 
-- [ ] Code is readable and well-named
-- [ ] Functions are focused (<50 lines)
-- [ ] Files are cohesive (<800 lines)
-- [ ] No deep nesting (>4 levels)
-- [ ] Errors are handled explicitly
-- [ ] No hardcoded secrets or credentials
+- [ ] Code quality standards met (see [coding-style.md](coding-style.md) for full checklist)
+- [ ] No security issues (see [security.md](security.md) for full checklist)
 - [ ] No console.log or debug statements
 - [ ] Tests exist for new functionality
 - [ ] Test coverage meets 80% minimum
@@ -81,15 +77,6 @@ Use these agents for code review:
 
 ## Common Issues to Catch
 
-### Security
-
-- Hardcoded credentials (API keys, passwords, tokens)
-- SQL injection (string concatenation in queries)
-- XSS vulnerabilities (unescaped user input)
-- Path traversal (unsanitized file paths)
-- CSRF protection missing
-- Authentication bypasses
-
 ### Code Quality
 
 - Large functions (>50 lines) - split into smaller
@@ -105,6 +92,16 @@ Use these agents for code review:
 - Missing pagination - add LIMIT to queries
 - Unbounded queries - add constraints
 - Missing caching - cache expensive operations
+
+### Tailwind CSS & shadcn/ui
+
+- Arbitrary Tailwind values (`bg-[#hex]`, `w-[375px]`, `rounded-[6px]`) - use semantic classes (`bg-primary`, `rounded-md`)
+- Custom components recreating shadcn/ui behavior - use shadcn/ui components from `@/components/ui/`
+- String concatenation for class names - use `cn()` from `@/lib/utils`
+- Hardcoded color/spacing values instead of design tokens - reference tokens via semantic Tailwind classes
+- Non-Lucide icon imports (Material Icons, etc.) - use Lucide React icons
+- Tailwind v3 config (`tailwind.config.ts`) in v4 projects - use CSS `@theme` blocks instead
+- Missing CVA variants when component has multiple visual states - define with `class-variance-authority`
 
 ## Approval Criteria
 
