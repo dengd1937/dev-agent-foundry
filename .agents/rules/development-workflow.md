@@ -44,17 +44,13 @@ The Feature Implementation Workflow describes the development pipeline: research
    - Remove debug artifacts (console.log, debugger, print statements)
    - Fix all errors before proceeding to code review
 
-5. **Code Review** _(MANDATORY gate before commit)_
-   - **This step is NON-NEGOTIABLE.** Every implementation session MUST pass through code review before committing.
-   - **Trigger point:** After all source files are written/modified and Quality Gate (step 4) is green, Claude MUST immediately invoke the appropriate review agent(s) — do NOT proceed to Documentation Decision (step 6) or Commit (step 7) without completing this step.
-   - Claude MUST run **code-reviewer** agent immediately after writing code, before any `git commit` or `git push`
-   - Python projects: also run **python-reviewer** agent
-   - TypeScript/Next.js projects: also run **typescript-reviewer** agent
-   - Auth, input validation, public endpoints, HTML rendering, file upload, or secret/env handling changes: also run **security-reviewer** agent
-   - Address CRITICAL and HIGH issues before proceeding
-   - Fix MEDIUM issues when possible
-   - Do NOT commit until review is complete and blockers are resolved
-   - **Self-check before commit:** Ask yourself: "Did I run code-reviewer on this code?" If the answer is no, stop and run it now.
+5. **Code Review** _(before commit)_
+   - Run **code-reviewer** agent after Quality Gate passes; the `pre-commit-review-check` hook will remind if skipped
+   - Python projects: also run **python-reviewer**
+   - TypeScript/Next.js: also run **typescript-reviewer**
+   - Auth, input validation, public endpoints, HTML rendering, file upload, or secret/env handling: also run **security-reviewer**
+   - Address CRITICAL and HIGH issues before commit; consider MEDIUM issues
+   - Override hook reminder when reviewing by other means: `export SKIP_REVIEW_CHECK=1`
 
 6. **Documentation Decision** _(before commit)_
    - Delete `docs/plans/<feature-name>.md` — planning docs are process artifacts, not long-term knowledge
