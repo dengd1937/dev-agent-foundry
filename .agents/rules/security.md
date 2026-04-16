@@ -15,10 +15,8 @@ Before ANY commit:
 
 ### Secret Management
 
-- NEVER hardcode secrets in source code
-- ALWAYS use environment variables or a secret manager
-- Validate that required secrets are present at startup
-- Rotate any secrets that may have been exposed
+- Secrets must not appear in source code — enforced by `pre-write-secrets` hook at write time
+- Validate that required secrets are present at startup; rotate any that may have been exposed
 
 ### Security Response Protocol
 
@@ -42,13 +40,6 @@ load_dotenv()
 api_key = os.environ["OPENAI_API_KEY"]  # Raises KeyError if missing
 ```
 
-### Security Scanning
-
-- Use **bandit** for static security analysis:
-  ```bash
-  bandit -r src/
-  ```
-
 ### Reference
 
 See skill: `django-security` for Django-specific security guidelines (if applicable).
@@ -58,8 +49,7 @@ See skill: `django-security` for Django-specific security guidelines (if applica
 
 ### Secret Management
 
-- Never hardcode secrets in source code
-- Use `process.env` with startup validation: throw if required key is missing
+Use `process.env` with startup validation — throw if missing, never silently default to undefined.
 
 ```typescript
 const apiKey = process.env.API_KEY

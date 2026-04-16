@@ -136,12 +136,6 @@ const userSchema = z.object({ email: z.string().email(), age: z.number().int().m
 type UserInput = z.infer<typeof userSchema>
 ```
 
-### Console-Based Debugging
-
-- No ad-hoc console debugging statements in production code
-- Use proper logging libraries instead
-- See hooks for automatic detection
-
 ### Tailwind CSS v4
 
 - Semantic classes only: `bg-primary`, `rounded-md` — never `bg-[#hex]`, `w-[375px]`, `rounded-[6px]`
