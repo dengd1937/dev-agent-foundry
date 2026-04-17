@@ -16,3 +16,8 @@
 - **L2（标准）**：其他所有 UI 工作 → 加载 `design-workflow` skill V2-1 到 V2-5
 
 L2 Gate 3 通过后的产物（intent.md、design.pen、screenshots/、components/、tokens/）进入 development-workflow。
+
+## 文档维护
+
+设计工作流（L1 或 L2）完成后：
+→ doc-updater agent 更新 component catalog 和 feature catalog

@@ -14,7 +14,7 @@
 3. **TDD** → tdd-guide agent → RED→GREEN→IMPROVE → 覆盖率 80%+
 4. **质量门控** → code-quality-gate skill → 格式化 + lint + 类型检查
 5. **代码审查** → code-reviewer agent（Python 项目加 python-reviewer agent；TS 项目加 typescript-reviewer agent；安全相关加 security-reviewer agent）
-6. **文档** — 删除 `docs/plans/`；新模块/集成/技术栈组件创建 `docs/modules/`
+6. **文档** — 删除 `docs/plans/`；模块文档 → doc-writer agent 模板：`module-doc`；完成后 → doc-updater agent 更新模块索引和 codemap
 7. **Commit** → commit-quality skill → Conventional Commits → 禁止 `--no-verify`
 8. **预审查** — CI/CD 通过、冲突已解决、分支已同步
 

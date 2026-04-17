@@ -11,7 +11,7 @@ Use `L1` when **all** of the following are true:
 
 1. Confirm the change is local and does not introduce new design primitives.
 2. Capture before/after screenshots for the affected area.
-3. Record a short note in `intent.md` or the PR description:
+3. Pass the design note data to → doc-writer agent 模板：`l1-design-note`
    - what changed
    - why it changed
    - which existing tokens/components were reused

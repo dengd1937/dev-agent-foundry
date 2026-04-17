@@ -63,9 +63,9 @@ Investigate requirements and establish design direction before editing the canva
 - Search the project for reusable design assets and existing `docs/designs/` directories
 - Use `pencil_batch_get` with `patterns: [{ reusable: true }]` to discover reusable components
 - Use `pencil_get_variables` to inspect the existing token system
-- Write the design intent, references, direction, and decision rationale
+- Pass the design intent data to → doc-writer agent 模板：`design-intent`
 
-**Output:** `docs/designs/<feature>/intent.md`
+**Output:** `docs/designs/<feature>/intent.md`（通过 doc-writer 写入）
 
 **Gate 1:** User confirms the design direction.
 
@@ -104,16 +104,7 @@ Refine the wireframe into the final design, expand the token system, and documen
 3. Run token pipeline — see pencil-design skill.
 4. Verify generated outputs (`tokens.css`, `tokens.ts`, `tailwind-preset.ts`).
 5. Capture final component and screen screenshots to `screenshots/.tmp/`, then promote approved results.
-6. Write component contracts only for key components or screens that need implementation guidance.
-
-**Required sections for each `components/*.md`:**
-
-- `## Variants`
-- `## States`
-- `## Responsive`
-- `## Accessibility`
-- `## Implementation Mapping`
-- `## Design Constraints`
+6. Pass component contract data to → doc-writer agent 模板：`component-contract`（doc-writer 包含完整模板：Variants、States、Responsive、Accessibility、Implementation Mapping、Design Constraints）
 
 **Rule:** Do not duplicate full TypeScript props interfaces in markdown unless design decisions directly constrain the public API. Source code remains the authority for props.
 
@@ -131,9 +122,8 @@ Review all design artifacts before handoff. This is the single hard approval gat
 
 1. Capture final screenshots for each documented breakpoint.
 2. Run `pencil_snapshot_layout({ problemsOnly: true })` on relevant screens.
-3. Save results:
+3. Pass layout report data to → doc-writer agent 模板：`layout-report`
    - approved screenshots → `docs/designs/<feature>/screenshots/`
-   - layout issues → `docs/designs/<feature>/screenshots/layout-report.md`
 
 **Phase 2 - `design-reviewer` agent**
 
@@ -145,7 +135,7 @@ Run the `design-reviewer` agent against `docs/designs/<feature>/`. The agent che
 
 1. Review the artifact report in conversation.
 2. Present final screenshots and review findings.
-3. On approval, write the verdict and approval decision to `docs/designs/<feature>/review-verdict.md`.
+3. On approval, pass verdict data to → doc-writer agent 模板：`review-verdict`
 
 **Outputs:**
 
