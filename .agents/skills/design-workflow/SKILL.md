@@ -46,7 +46,8 @@ All design artifacts live under `docs/designs/<feature>/`. See pencil-design ski
 - Add `docs/designs/**/screenshots/.tmp/` to `.gitignore`.
 - Only promote screenshots from `.tmp/` to `screenshots/` after approval.
 - `intent.md` is long-term knowledge. Keep it for the life of the feature.
-- Commit `.pen`, tokens, components, screenshots; `.tmp/` is gitignored.
+- **`.pen` files live in the Pencil editor (like Figma cloud). They are NOT committed to `docs/designs/`.** During development, use Pencil MCP to read/write the design directly. Screenshots, tokens, and component contracts are the persistent artifacts in the repo.
+- Commit tokens, components, screenshots; `.tmp/` is gitignored.
 
 ---
 
@@ -86,7 +87,6 @@ Create the page structure and establish the minimum token set needed to support 
 
 **Outputs:**
 
-- `docs/designs/<feature>/wireframes.pen`
 - Final approved wireframe screenshot(s) in `docs/designs/<feature>/screenshots/`
 
 **Gate 2:** User confirms layout, page regions, and overall structure.
@@ -153,7 +153,7 @@ After Gate 3, design artifacts become inputs to the development workflow.
 
 | Dev Step | Consumes | How |
 |----------|----------|-----|
-| Step 1 (Research & Reuse) | `intent.md`, `design.pen`, `screenshots/` | Confirm design direction and visual target |
+| Step 1 (Research & Reuse) | `intent.md`, `screenshots/`, Pencil MCP | Confirm design direction and visual target; read precise properties via MCP if needed |
 | Step 2 (Plan First) | `components/*.md`, `review-verdict.md` | Reference component contracts and review findings in the implementation plan |
 | Step 3 (TDD) | `tokens/*`, `components/*.md` | Validate token usage, run Playwright visual regression, run axe-core accessibility audit |
 
@@ -173,11 +173,11 @@ After Gate 3, design artifacts become inputs to the development workflow.
 
 ## Version Control Strategy
 
-`.pen` files are binary and cannot be diffed or merged reliably by git.
+`.pen` files live in the Pencil editor and are NOT committed to the repo.
 
-- One `.pen` file pair per feature: `wireframes.pen` and `design.pen`
-- Keep `wireframes.pen` and `design.pen` separate
-- Do not edit the same `.pen` file in parallel on multiple branches
+- Screenshots, tokens, and component contracts are the version-controlled artifacts
+- Do not edit the same design in Pencil on multiple branches simultaneously
+- Use Pencil MCP during development to read precise design properties
 
 ---
 

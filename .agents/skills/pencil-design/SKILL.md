@@ -188,6 +188,7 @@ See [design-to-code-workflow.md](references/design-to-code-workflow.md) for comp
 | Generating `bg-[#3b82f6]` | Use semantic class: `bg-primary` |
 | Not checking for overflow | Call `pencil_snapshot_layout(problemsOnly: true)` after every section |
 | Skipping screenshots | Call `pencil_get_screenshot` after every section |
+| export succeeds but screenshots/ empty | Re-run `export_nodes`; verify directory contains files before marking task done |
 | Generating a new logo | Copy existing logo with `C()` |
 | Using `tailwind.config.ts` | Use CSS `@theme` block (Tailwind v4) |
 
