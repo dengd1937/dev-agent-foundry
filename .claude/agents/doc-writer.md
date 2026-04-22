@@ -25,6 +25,7 @@ model: haiku
 | `product-brief` | `docs/product/<feature>.md` | ideate Phase 4 |
 | `design-intent` | `docs/designs/<feature>/intent.md` | design-workflow V2-1 |
 | `component-contract` | `docs/designs/<feature>/components/<Name>.md` | design-workflow V2-3 |
+| `token-source-map` | `docs/designs/<feature>/tokens/source-map.md` | design-workflow V2-2 / V2-3 |
 | `review-verdict` | `docs/designs/<feature>/review-verdict.md` | design-workflow V2-4 |
 | `layout-report` | `docs/designs/<feature>/screenshots/layout-report.md` | design-workflow V2-4 |
 | `l1-design-note` | `docs/designs/<feature>/intent.md`（追加） | design-workflow L1 |
@@ -184,6 +185,34 @@ model: haiku
 
 ## API Notes
 [仅在设计决策约束公共 API 时填写。源代码是 TypeScript props 的唯一来源。]
+```
+
+### token-source-map
+
+`docs/designs/<feature>/tokens/source-map.md` — token 来源追踪。
+
+```markdown
+# Token Source Map
+
+## 来源规则
+
+| Source | 含义 |
+|---|---|
+| DESIGN.md | 来自项目根目录 DESIGN.md |
+| existing Pencil variable | 来自已有 Pencil 变量 |
+| existing code token | 来自已有代码 token |
+| fallback | DESIGN.md 缺失该规则时的保守默认值 |
+| user decision | 用户明确批准的新视觉身份规则 |
+
+## Tokens
+
+| Token | Value | Source | Source Detail | Rationale |
+|---|---:|---|---|---|
+| [token] | [value] | [source] | [section / variable / file] | [why this source is valid] |
+
+## Design Identity Gaps
+
+- [gap]：[是否已由用户决策解决]
 ```
 
 ### review-verdict

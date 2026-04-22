@@ -1,6 +1,6 @@
 ---
 name: design-workflow
-description: UI design workflow orchestration (v2). TRIGGER when: new UI feature, new page, new component, or visual change; tasks involving docs/designs/ directories, *.pen files, Pencil MCP tools, or design tokens; reading design artifacts before implementation. Skip for backend-only, config-only, refactoring without visual impact.
+description: "UI design workflow orchestration (v2). TRIGGER when: new UI feature, new page, new component, or visual change; tasks involving docs/designs/ directories, *.pen files, Pencil MCP tools, or design tokens; reading design artifacts before implementation. Skip for backend-only, config-only, refactoring without visual impact."
 metadata:
   author: sre-copilot
   version: "2.0"
@@ -38,7 +38,7 @@ metadata:
 5. **DESIGN.md is the visual identity authority when it exists.**
    - Read `DESIGN.md` at the start of every V2 stage.
    - Tokens are derived from DESIGN.md (color palette → brand tokens, typography → font tokens, etc.).
-   - DESIGN.md is one-way: the design workflow never writes back to it. If a design need falls outside DESIGN.md scope, fix the design, not the file.
+   - The workflow never silently writes back to DESIGN.md. If a design need falls outside DESIGN.md scope, record a design identity gap and ask the user whether to constrain the design or intentionally update DESIGN.md.
 
 ---
 
@@ -52,6 +52,8 @@ When `DESIGN.md` exists in the project root, it serves as the visual identity si
 
 See pencil-design skill `tokens-and-variables.md` for the complete mapping table.
 
+Before treating DESIGN.md as authoritative, run the DESIGN.md preflight in [design-md-preflight.md](references/design-md-preflight.md). Incomplete DESIGN.md files can still guide the workflow, but missing sections become explicit gaps instead of hidden assumptions.
+
 ---
 
 ## Directory Layout
@@ -63,8 +65,8 @@ All design artifacts live under `docs/designs/<feature>/`. See pencil-design ski
 - Add `docs/designs/**/screenshots/.tmp/` to `.gitignore`.
 - Only promote screenshots from `.tmp/` to `screenshots/` after approval.
 - `intent.md` is long-term knowledge. Keep it for the life of the feature.
-- **`.pen` files live in the Pencil editor (like Figma cloud). They are NOT committed to `docs/designs/`.** During development, use Pencil MCP to read/write the design directly. Screenshots, tokens, and component contracts are the persistent artifacts in the repo.
-- Commit tokens, components, screenshots; `.tmp/` is gitignored.
+- **`.pen` files live in the Pencil editor (like Figma cloud). They are NOT committed to `docs/designs/`.** During design and development, use Pencil MCP to read/write the active design directly. Screenshots, tokens, source maps, and component contracts are the persistent artifacts in the repo.
+- Commit tokens, token source maps, components, screenshots; `.tmp/` is gitignored.
 
 ---
 
@@ -76,10 +78,10 @@ Investigate requirements and establish design direction before editing the canva
 
 **Actions:**
 
-- **If `DESIGN.md` exists**, read it first as the visual identity source: color palette, typography, component styles, layout principles, depth rules, do's and don'ts, and responsive behavior become hard constraints for all subsequent stages
+- **If `DESIGN.md` exists**, read it first and run DESIGN.md preflight: complete sections become visual identity constraints; missing or ambiguous sections become design identity gaps that require user decision before they are treated as defaults
 - **If `docs/product/<feature>.md` exists**, read it as the functional requirements input: UI scope, user flows, feature list, competitor references, and design constraints come from the PM stage
 - Analyze the UI scope: pages, components, interactions, and constraints
-- **If `DESIGN.md` exists**, classify components into "matches existing DESIGN.md component styles" vs "requires new component variant"
+- **If `DESIGN.md` exists**, classify components into "matches existing DESIGN.md component styles", "requires documented identity gap", or "requires user-approved DESIGN.md update"
 - Search the project for reusable design assets and existing `docs/designs/` directories
 - Use `pencil_batch_get` with `patterns: [{ reusable: true }]` to discover reusable components
 - Use `pencil_get_variables` to inspect the existing token system
@@ -107,14 +109,16 @@ Create the page structure and establish the minimum token set needed to support 
    - *Do's and don'ts* is not tokenized — it applies as a validation constraint in V2-3 and V2-4
 2. If `DESIGN.md` does not exist, define/confirm baseline tokens (brand, semantic, surface, typography, radius) as usual — see pencil-design skill for complete token reference.
 3. Verify tokens with `pencil_get_variables`.
-4. Build the wireframe and page regions using reusable components and tokenized values only.
-5. Capture review screenshots to `screenshots/.tmp/`.
-6. Run `pencil_snapshot_layout({ problemsOnly: true })` on the affected screens.
-7. Iterate until the page structure and regions are stable.
+4. Pass token provenance data to → doc-writer agent 模板：`token-source-map` when tokens are derived from DESIGN.md, existing variables, or fallback defaults.
+5. Build the wireframe and page regions using reusable components and tokenized values only.
+6. Capture review screenshots to `screenshots/.tmp/`.
+7. Run `pencil_snapshot_layout({ problemsOnly: true })` on the affected screens.
+8. Iterate until the page structure and regions are stable.
 
 **Outputs:**
 
 - Final approved wireframe screenshot(s) in `docs/designs/<feature>/screenshots/`
+- `docs/designs/<feature>/tokens/source-map.md` when tokens are derived or updated
 
 **Gate 2:** User confirms layout, page regions, and overall structure.
 
@@ -126,22 +130,23 @@ Refine the wireframe into the final design, expand the token system, and documen
 
 **Actions:**
 
-1. Refine the design to high fidelity in `design.pen`.
+1. Refine the design to high fidelity in the active Pencil design.
 2. **If `DESIGN.md` exists**, enforce its rules as hard guardrails:
    - Component styles must stay within DESIGN.md *Component styles* definitions
    - Colors must stay within DESIGN.md *Color palette and roles* scope
    - DESIGN.md *Do's and don'ts* are non-negotiable constraints
    - Responsive behavior must follow DESIGN.md *Responsive behavior* module
-   - Any design element outside DESIGN.md scope must be flagged — fix the design, not the file
-2. Expand tokens (spacing, shadows, breakpoints, theme variants) as needed.
-3. Run token pipeline — see pencil-design skill.
-4. Verify generated outputs (`tokens.css`, `tokens.ts`, `tailwind-preset.ts`).
-5. Capture final component and screen screenshots to `screenshots/.tmp/`, then promote approved results.
-6. Pass component contract data to → doc-writer agent 模板：`component-contract`（doc-writer 包含完整模板：Variants、States、Responsive、Accessibility、Implementation Mapping、Design Constraints）
+   - Any design element outside DESIGN.md scope must be flagged as a design identity gap; do not silently modify DESIGN.md or invent a new visual direction
+3. Expand tokens (spacing, shadows, breakpoints, theme variants) as needed.
+4. Update token source-map when tokens are added or their source changes.
+5. Run token pipeline — see pencil-design skill.
+6. Verify generated outputs (`tokens.css`, `tokens.ts`, `tailwind-preset.ts`).
+7. Capture final component and screen screenshots to `screenshots/.tmp/`, then promote approved results.
+8. Pass component contract data to → doc-writer agent 模板：`component-contract`（doc-writer 包含完整模板：Variants、States、Responsive、Accessibility、Implementation Mapping、Design Constraints）
 
 **Rule:** Do not duplicate full TypeScript props interfaces in markdown unless design decisions directly constrain the public API. Source code remains the authority for props.
 
-**Completion standard:** Key components are covered, and generated token outputs are consistent with `w3c.json`.
+**Completion standard:** Key components are covered, generated token outputs are consistent with `w3c.json`, and token provenance is current in `tokens/source-map.md`.
 
 ---
 
@@ -160,13 +165,13 @@ Review all design artifacts before handoff. This is the single hard approval gat
 
 **Phase 2 - `design-reviewer` agent**
 
-Run the `design-reviewer` agent against `docs/designs/<feature>/`. The agent checks token coverage, contract completeness, artifact consistency, a11y docs, and responsive coverage.
+Run the `design-reviewer` agent against `docs/designs/<feature>/`. The agent checks token coverage, contract completeness, artifact consistency, a11y docs, responsive coverage, and DESIGN.md compliance when DESIGN.md exists.
 
 **If `DESIGN.md` exists**, the agent additionally checks:
 - Do all tokens trace back to a DESIGN.md rule?
 - Are there colors, fonts, or component variants not defined in DESIGN.md?
 - Does the design violate any DESIGN.md *Do's and don'ts*?
-- Violations require fixing the design — never extend DESIGN.md to accommodate them.
+- Violations block handoff until resolved by either constraining the design or a user-approved DESIGN.md update.
 
 **Visual quality is still reviewed by humans, not the agent.**
 
@@ -194,9 +199,9 @@ After Gate 3, design artifacts become inputs to the development workflow.
 
 | Dev Step | Consumes | How |
 |----------|----------|-----|
-| Step 1 (Research & Reuse) | `intent.md`, `screenshots/`, Pencil MCP | Confirm design direction and visual target; read precise properties via MCP if needed |
-| Step 2 (Plan First) | `components/*.md`, `review-verdict.md` | Reference component contracts and review findings in the implementation plan |
-| Step 3 (TDD) | `tokens/*`, `components/*.md` | Validate token usage, run Playwright visual regression, run axe-core accessibility audit |
+| Step 1 (Research & Reuse) | `DESIGN.md` if present, `intent.md`, `screenshots/`, Pencil MCP | Confirm visual authority, design direction, and target; read precise properties via MCP if needed |
+| Step 2 (Plan First) | `components/*.md`, `review-verdict.md`, `tokens/source-map.md` | Reference component contracts, DESIGN.md gaps, token provenance, and review findings in the implementation plan |
+| Step 3 (TDD) | `tokens/*`, `components/*.md`, `DESIGN.md` if present | Validate token usage, prevent hardcoded visual values, run Playwright visual regression, run axe-core accessibility audit |
 
 **Implementation-side rule:** If implementation changes the visual contract or reveals a missing token, update `docs/designs/<feature>/` in the same PR. Do not patch around the gap with hardcoded values.
 
@@ -209,7 +214,7 @@ After Gate 3, design artifacts become inputs to the development workflow.
 - **Review findings (V2-4 → V2-3)**: update design/screenshots/contracts → re-run V2-4
 - **Dev discovers gap**: update design artifact in same PR → keep code and design aligned
 - **Direction change**: update intent.md with new rationale → restart from V2-1
-- **DESIGN.md violation found during V2-3 or V2-4**: fix the design to comply → never modify DESIGN.md to accommodate the design
+- **DESIGN.md violation found during V2-3 or V2-4**: constrain the design by default; if the visual identity itself must change, stop and request explicit user approval before DESIGN.md is updated
 
 ---
 

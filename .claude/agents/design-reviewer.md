@@ -30,11 +30,14 @@ The caller provides:
 2. **Pencil MCP results** (already saved to filesystem):
    - Screenshots in `docs/designs/<feature>/screenshots/` (`.png` files — presence is checked, contents are NOT analyzed)
    - Layout report saved as `docs/designs/<feature>/screenshots/layout-report.md`
+3. **Optional `DESIGN.md` path** — when present in the project root, use it as the visual identity authority
+4. **Optional token source map** — `docs/designs/<feature>/tokens/source-map.md`, used to verify token provenance when available
 
 You read from filesystem only. You do NOT call Pencil MCP tools. You do NOT analyze PNG files.
 
 **Not expected at V2-4**:
 
+- `.pen` files are managed by the Pencil editor and are NOT committed to the repo. Their absence is NEVER a blocker.
 - `visual-regression-report.md` and `accessibility-report.md` are produced during the development workflow Step 3 (against the implemented frontend), not during design-time review. If these files happen to exist (e.g., re-review after implementation), you may cross-check them — but their absence is NEVER a blocker at V2-4.
 
 ---
@@ -53,13 +56,12 @@ Expected artifact structure at V2-4:
 ```
 docs/designs/<feature>/
 ├── intent.md                         # REQUIRED: design intent and decision log
-├── design.pen                        # REQUIRED: final high-fidelity design (binary, presence only)
-├── wireframes.pen                    # OPTIONAL: wireframes (history)
 ├── tokens/
 │   ├── w3c.json                      # REQUIRED: W3C DTCG tokens (source of truth)
 │   ├── tokens.css                    # REQUIRED: generated CSS custom properties
 │   ├── tokens.ts                     # REQUIRED: generated TypeScript typed constants
-│   └── tailwind-preset.ts            # REQUIRED: generated Tailwind v4 preset
+│   ├── tailwind-preset.ts            # REQUIRED: generated Tailwind v4 preset
+│   └── source-map.md                  # OPTIONAL: token provenance, required when DESIGN.md-derived tokens exist
 ├── components/
 │   ├── ComponentA.md                 # REQUIRED: key component contract
 │   └── ComponentB.md
@@ -70,6 +72,7 @@ docs/designs/<feature>/
 
 **Not expected at V2-4** (produced later by dev Step 3):
 
+- `design.pen` / `wireframes.pen` — Pencil source files stay in the editor, not the repo
 - `screenshots/baselines/` — Playwright visual regression baselines
 - `screenshots/visual-regression-report.md` — Playwright diff results
 - `screenshots/accessibility-report.md` — axe-core WCAG audit
@@ -80,7 +83,7 @@ If critical artifacts (marked REQUIRED) are missing, flag immediately as a block
 
 ## Review Dimensions
 
-Review each dimension independently. Score 0-10 per dimension.
+Review each dimension independently. Score 0-10 per dimension. `DESIGN.md Compliance` may be `N/A` when no `DESIGN.md` exists.
 
 ### Dimension 1: Token Coverage & Consistency
 
@@ -161,7 +164,7 @@ Focus:
 How to check:
 1. Filesystem structure:
    a. Glob docs/designs/<feature>/ — verify REQUIRED artifacts exist
-   b. Flag any missing REQUIRED files (intent.md, design.pen, tokens/*, components/*.md, screenshots/layout-report.md)
+   b. Flag any missing REQUIRED files (intent.md, tokens/*, components/*.md, screenshots/layout-report.md)
 2. Layout report review:
    a. Read layout-report.md
    b. Enumerate all flagged issues (overflow, clipping, overlap)
@@ -263,6 +266,40 @@ Red flags:
 - Sidebar layout without mobile collapse/hidden behavior
 ```
 
+### Dimension 6: DESIGN.md Compliance
+
+```
+Scope:
+- Run this dimension only when DESIGN.md exists in the project root.
+- If DESIGN.md does not exist, mark the dimension "N/A" and do not penalize the design.
+
+Focus:
+- Do visual decisions comply with DESIGN.md color palette, typography, component styles, layout principles, depth rules, do's and don'ts, and responsive behavior?
+- Do tokens derived from DESIGN.md have traceable provenance?
+- Are any component variants, colors, fonts, shadows, or layout patterns outside DESIGN.md scope?
+- Are identity gaps surfaced for user decision instead of silently changing DESIGN.md?
+
+How to check:
+1. Read DESIGN.md — extract the stated color roles, typography rules, component style constraints, depth rules, responsive behavior, and do's/don'ts.
+2. Read tokens/source-map.md if present:
+   - For each token marked `source: DESIGN.md`, verify the referenced section exists and supports the value.
+   - For each token with `source: existing variable` or `source: fallback`, verify the rationale explains why DESIGN.md did not provide that value.
+   - If DESIGN.md-derived tokens exist but source-map.md is missing, flag this as a HIGH issue because provenance cannot be verified.
+3. Read tokens/w3c.json and components/*.md:
+   - Flag colors, fonts, radius, shadows, or component variants that cannot be tied to DESIGN.md, source-map rationale, or existing reusable components.
+   - Flag hardcoded visual values that bypass DESIGN.md-derived tokens.
+4. Read intent.md:
+   - Verify it identifies DESIGN.md as visual authority when present.
+   - Verify any design identity gap is documented and resolved by user decision.
+
+Red flags:
+- DESIGN.md says "no gradients" but component contract requires a gradient background.
+- A token source map claims `primary` comes from DESIGN.md, but DESIGN.md has no matching color role.
+- DESIGN.md exists and tokens were generated, but tokens/source-map.md is missing.
+- A new card variant appears in components/*.md without support in DESIGN.md or documented user approval.
+- A design identity gap is resolved by silently changing DESIGN.md or inventing fallback values without user decision.
+```
+
 ---
 
 ## Cross-Reference Checks
@@ -319,6 +356,7 @@ All output is returned in conversation. The caller (main conversation) will writ
 | Artifact Structural Consistency | X/10 | [one sentence] |
 | Accessibility Documentation | X/10 | [one sentence] |
 | Responsive Coverage | X/10 | [one sentence] |
+| DESIGN.md Compliance | X/10 or N/A | [one sentence] |
 
 ### Detailed Findings
 
@@ -358,7 +396,7 @@ Reason: [one sentence]
 Review is complete when:
 
 - [ ] All artifacts enumerated and missing ones flagged
-- [ ] 5 dimensions all scored
+- [ ] 6 dimensions all scored, with DESIGN.md Compliance marked N/A when DESIGN.md is absent
 - [ ] Every finding references a specific artifact (file path + section/line)
 - [ ] Cross-reference checks completed
 - [ ] Failure modes documented

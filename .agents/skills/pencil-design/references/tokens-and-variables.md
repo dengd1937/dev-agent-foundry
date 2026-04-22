@@ -28,6 +28,32 @@ When DESIGN.md exists: **DESIGN.md values > existing Pencil variables > defaults
 
 If a DESIGN.md value conflicts with an existing Pencil variable, use the DESIGN.md value and update the variable via `pencil_set_variables`.
 
+Every token decision must record provenance in `docs/designs/<feature>/tokens/source-map.md`. This gives reviewers evidence for whether a token came from DESIGN.md, an existing Pencil variable, or a fallback default.
+
+### Token Source Map
+
+Create or update `docs/designs/<feature>/tokens/source-map.md` whenever baseline tokens are created or expanded.
+
+```markdown
+# Token Source Map
+
+| Token | Value | Source | Source Detail | Rationale |
+|---|---:|---|---|---|
+| primary | #3b82f6 | DESIGN.md | Color palette and roles / primary action | Primary action color defined by visual identity |
+| radius-md | 6px | existing Pencil variable | `radius-md` | Matches existing component system |
+| shadow-sm | 0 1px 2px rgba(...) | fallback | shadcn/ui default | DESIGN.md has no elevation rule; conservative fallback pending user decision |
+```
+
+Source must be one of:
+
+- `DESIGN.md`
+- `existing Pencil variable`
+- `existing code token`
+- `fallback`
+- `user decision`
+
+If `Source` is `fallback`, the rationale must identify the DESIGN.md gap and should be resolved before Gate 3 when the token materially affects brand identity.
+
 Always read tokens at the start of any design task:
 
 ```javascript
@@ -177,6 +203,7 @@ Style Dictionary + style-dictionary-utils
   +-- tokens.css              (--color-primary: #3b82f6; ...)
   +-- tokens.ts               (typed constant references)
   +-- tailwind-preset.ts      (Tailwind v4 plugin with @theme declarations)
+  +-- source-map.md           (human-readable token provenance)
 ```
 
 ### W3C DTCG Intermediate Format
@@ -251,6 +278,7 @@ Pencil variables map 1:1 to Tailwind v4 semantic utilities. Never use arbitrary 
 - [ ] Called `pencil_get_variables` to see available tokens?
 - [ ] Using variable references instead of hardcoded values?
 - [ ] If needed variable doesn't exist, created it with `pencil_set_variables`?
+- [ ] Updated `tokens/source-map.md` for every new or changed token?
 - [ ] For code generation: using semantic Tailwind classes, NOT arbitrary values?
 
 ## See Also

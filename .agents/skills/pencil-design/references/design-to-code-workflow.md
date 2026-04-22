@@ -8,11 +8,13 @@ Target stack: React/Next.js, TypeScript, Tailwind CSS v4, shadcn/ui, Lucide icon
 
 ## Step 1: Load Aesthetic Direction
 
-Follow shadcn/ui aesthetic direction for:
-- Typography guidelines: distinctive font pairings
-- Color and theme: cohesive palettes with dominant colors
-- Motion: purposeful transitions and micro-interactions
-- Spatial composition: layouts with negative space
+Use this priority order:
+
+1. `DESIGN.md` in the project root, when present. It is the visual identity authority for typography, color, theme, depth, component styling, motion, spacing, and responsive behavior.
+2. Existing project design artifacts: `docs/product/`, `docs/designs/`, reusable Pencil components, and existing tokens.
+3. shadcn/ui visual defaults as a conservative fallback only when no project-specific direction exists.
+
+shadcn/ui can still be the preferred component implementation library even when DESIGN.md defines a different visual style.
 
 Consult [tailwind-shadcn-mapping.md](tailwind-shadcn-mapping.md) for property-to-class mappings.
 
@@ -180,7 +182,7 @@ shadcn/ui visual polish guidelines:
 
 ## Checklist
 
-- [ ] Following shadcn/ui aesthetic direction?
+- [ ] Loaded the active aesthetic direction (DESIGN.md -> project artifacts -> shadcn/ui fallback)?
 - [ ] Called `pencil_get_guidelines` for code and tailwind topics?
 - [ ] Read design tokens with `pencil_get_variables`?
 - [ ] Read design tree with `pencil_batch_get`?

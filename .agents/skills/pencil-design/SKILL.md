@@ -98,15 +98,17 @@ See [visual-verification.md](references/visual-verification.md) for verification
 3. Only use `G()` (Generate) for genuinely new images
 4. Logos: always copy from existing instance, never regenerate
 
-### Rule 6: Follow shadcn/ui Aesthetic Direction
+### Rule 6: Use the Active Aesthetic Direction
 
 **NEVER design in Pencil or generate code without aesthetic direction.**
 
-Follow shadcn/ui default aesthetics for:
-- Typography guidelines
-- Color and theme direction
-- Motion and animation
-- Spatial composition
+Priority:
+
+1. If `DESIGN.md` exists, use it as the visual identity authority for typography, color, theme, motion, spacing, and component style decisions.
+2. If `DESIGN.md` does not exist, use the existing product/design docs and reusable Pencil components as the local direction.
+3. If no project-specific direction exists, use shadcn/ui default aesthetics as the conservative fallback.
+
+shadcn/ui can remain the preferred implementation library even when it is not the aesthetic authority.
 
 Consult [tailwind-shadcn-mapping.md](references/tailwind-shadcn-mapping.md) for property-to-class mappings.
 
@@ -158,7 +160,7 @@ See [tokens-and-variables.md](references/tokens-and-variables.md) for full pipel
 ### Design-to-Code (V2-3)
 
 ```
-1. Follow shadcn/ui aesthetic direction (see Rule 6)
+1. Load the active aesthetic direction (DESIGN.md -> project docs/components -> shadcn/ui fallback)
 2. pencil_get_guidelines (code, tailwind) -> Get code generation rules
 3. pencil_get_variables -> Map tokens to Tailwind @theme
 4. pencil_batch_get -> Read design tree

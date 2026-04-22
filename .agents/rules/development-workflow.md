@@ -18,6 +18,8 @@
 ### 前置：调研与规划
 
 1. **调研与复用** — 阅读已有产物（`docs/product/`、`docs/designs/`）；搜索现有实现；优先成熟库
+   - UI 任务必须额外读取：项目根目录 `DESIGN.md`（如存在）、`docs/designs/<feature>/review-verdict.md`、`docs/designs/<feature>/tokens/`、`docs/designs/<feature>/components/*.md`
+   - 如果设计产物记录了 design identity gap，计划阶段必须说明采用“收敛设计”还是“等待用户更新 DESIGN.md”
 2. **规划** → planner agent → 输出任务级计划（每任务 1-3 文件）→ 保存至 `docs/plans/` → **用户批准前不写代码**
 
 ### 循环：逐任务执行
@@ -25,8 +27,11 @@
 对计划中的每个任务，重复以下步骤。每个任务完成后才能进入下一个任务。
 
 3. **TDD** → tdd-guide agent → RED→GREEN→IMPROVE → 覆盖率 80%+
+   - UI 实现不得绕过设计 token：禁止硬编码颜色、圆角、阴影、字体等视觉值，禁止使用 arbitrary Tailwind 作为常规方案
+   - UI 实现必须保持组件契约和 DESIGN.md（如存在）一致；发现缺失 token 或契约缺口时回到设计产物补齐
 4. **质量门控** → code-quality-gate skill → 格式化 + lint + 类型检查
 5. **代码审查** → code-reviewer agent（Python 项目加 python-reviewer agent；TS 项目加 typescript-reviewer agent；安全相关加 security-reviewer agent）
+   - UI 任务审查必须检查 semantic token 使用、组件契约一致性、DESIGN.md 约束继承、Playwright 视觉回归和 axe 可访问性验证
 
 不允许跨任务合并审查。不允许"实现所有文件后统一审查"。
 

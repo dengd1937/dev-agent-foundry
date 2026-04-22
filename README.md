@@ -135,7 +135,7 @@ doc-updater agent（独立上下文）
 ```
 
 - **工作流**：只产出结构化数据，不写文件、不含模板
-- **doc-writer**：集中管理 7 个文档模板，接收数据后格式化写入
+- **doc-writer**：集中管理 8 个文档模板，接收数据后格式化写入
 - **doc-updater**：维护 feature catalog、component catalog、module index、codemap，评估 README 同步需求
 
 ## DESIGN.md
@@ -146,11 +146,13 @@ doc-updater agent（独立上下文）
 
 没有 DESIGN.md 时，AI agent 生成的 UI 会趋向通用风格（圆角卡片、蓝紫渐变、居中 Hero）。引入后，agent 在生成任何 UI 前自动读取 DESIGN.md 作为视觉约束，输出与品牌风格一致的结果。
 
+meridian 不自带具体项目审美。它只提供读取、校验和执行 DESIGN.md 的工作流；具体 DESIGN.md 应由下游项目根据产品定位、品牌资产和用户审美自行选择或编写。
+
 ### 如何获取
 
-**方式一：从社区收藏拉取**
+**方式一：从社区收藏选择起点**
 
-[VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) 收录了 55+ 品牌设计系统模板（Stripe、Linear、Vercel、Apple 等），可直接使用：
+[VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md) 收录了 55+ 品牌设计系统模板（Stripe、Linear、Vercel、Apple 等），适合作为参考或改写起点：
 
 ```bash
 # 在项目根目录执行，自动下载 DESIGN.md
@@ -158,6 +160,8 @@ npx getdesign@latest add linear.app
 ```
 
 也可在 [getdesign.md](https://getdesign.md) 在线浏览和预览。
+
+> 社区模板不等于品牌授权。生产项目使用真实品牌风格前，需要确认授权、商标/品牌风险，并根据当前项目定位改写。
 
 **方式二：从已有设计系统整理**
 
@@ -170,7 +174,8 @@ npx getdesign@latest add linear.app
 - 设计工作流规则（`.agents/rules/design-workflow.md`）和 skill 会指示 AI agent 在设计工作开始前和每个主要设计阶段读取 DESIGN.md
 - 如果项目根目录也有 `CLAUDE.md`，它也会指示 agent 在生成 UI 前读取 DESIGN.md
 - 设计工作流 V2 各阶段以 DESIGN.md 为视觉身份唯一权威（SSOT），token 从中派生
-- 单向流：DESIGN.md 创建后不随设计工作流更新，用户如需变更需手动修改
+- 默认只读：工作流不会静默修改 DESIGN.md；如果设计需求超出 DESIGN.md，会记录 design identity gap，并要求用户决定是收敛设计还是更新 DESIGN.md
+- 没有 DESIGN.md 时，工作流退回到已有产品/设计产物；仍无项目审美输入时，才使用保守 fallback
 
 ## 使用方式
 

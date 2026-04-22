@@ -26,7 +26,13 @@ description: 标准开发流程的执行引擎。按任务粒度执行 TDD + 审
 1. 读取计划文件（`docs/plans/`）
 2. 提取所有任务文本
 3. 检查粒度：每任务 1-3 文件，有独立 TDD 步骤和审查门控
-4. 不合格 → 报告用户，建议重新拆分
+4. 如果任务涉及 UI，实现前确认计划已引用：
+   - `DESIGN.md`（如存在）
+   - `docs/designs/<feature>/review-verdict.md`
+   - `docs/designs/<feature>/tokens/`
+   - `docs/designs/<feature>/components/*.md`
+   - 已记录的 design identity gap 及其用户决策
+5. 不合格 → 报告用户，建议重新拆分
 
 ---
 
@@ -63,6 +69,14 @@ tdd-guide 完成后，调用 `/code-quality-gate` skill：
 ### Step 3：规格合规审查
 
 调度 `code-reviewer`，对照原始任务要求：是否完成全部要求、是否遗漏边界条件、是否偏离范围。
+
+UI 任务额外检查：
+
+- 是否使用 semantic tokens，而不是硬编码颜色、圆角、阴影、字体等视觉值
+- 是否避免 arbitrary Tailwind 作为常规样式方案
+- 是否符合组件契约、`review-verdict.md` 和 DESIGN.md（如存在）
+- 是否补齐缺失 token / 设计契约，而不是在实现层临时绕过
+- 是否产出 Playwright 视觉回归和 axe 可访问性验证结果（适用于可运行前端）
 
 ### Step 4：代码质量审查
 

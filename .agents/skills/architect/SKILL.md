@@ -1,6 +1,6 @@
 ---
 name: architect
-description: 架构评估与决策记录。TRIGGER when: 新功能涉及新模块/数据表/API 端点、集成外部系统、引入新依赖、数据模型变更、影响 ≥2 个模块的改动。Skip for: 纯 UI 调整、单模块内的小改动、配置值变更。
+description: "架构评估与决策记录。TRIGGER when: 新功能涉及新模块/数据表/API 端点、集成外部系统、引入新依赖、数据模型变更、影响 ≥2 个模块的改动。Skip for: 纯 UI 调整、单模块内的小改动、配置值变更。"
 metadata:
   author: sre-copilot
   version: "1.0"
